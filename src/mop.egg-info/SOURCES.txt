@@ -1,0 +1,8 @@
+hello.py
+setup.py
+mop.egg-info/PKG-INFO
+mop.egg-info/SOURCES.txt
+mop.egg-info/dependency_links.txt
+mop.egg-info/entry_points.txt
+mop.egg-info/requires.txt
+mop.egg-info/top_level.txt
