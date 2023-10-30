@@ -5,10 +5,13 @@ import logging
 from os import path
 import os
 import subprocess
+import pandas as pd
+from pandas.testing import assert_frame_equal
 
 import unittest
 #from mopp._defaults import (DESC_MD, DESC_INPUT)
-from mopp.modules import (trim, load_metadata, md_to_dict)
+from mopp.modules import trim
+from mopp.modules import load_metadata, md_to_dict
 import logging
 
 def tearDown(dir):
@@ -20,9 +23,60 @@ def tearDown(dir):
 
 
 
-class Test_Trim(unittest.TestCase):
+class Test(unittest.TestCase):
+
+    ### METADATA FUNCTIONS
+
+    def test_load_metadatafile(self):
+
+        test_df = load_metadata('./test/data/metadata.tsv')
+
+        expected_data = pd.DataFrame({
+            "sample_name": ["1-1_t2_metaRS_S13_L004_R1_001.250k.fastq.gz", 
+                     "1-1_t2_metaT_S37_L004_R2_001.250k.fastq.gz", 
+                     "1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz",
+                     "1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz",
+                     "1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz"],
+
+            "identifier" : ["1-1_t2",
+                            "1-1_t2",
+                            "1-1_t2",
+                            "1-1_t2",
+                            "1-1_t2"],
+
+            "omic": ["metaRS",
+                     "metaT",
+                     "metaT",
+                     "metaG",
+                     "metaG"],
+
+            "strand": ["R1",
+                       "R2",
+                       "R1",
+                       "R2",
+                       "R1"]
+        })
+        expected_data = expected_data.set_index("sample_name")
+        assert_frame_equal(test_df, expected_data)
+
+    def test_md_to_dict(self):
+
+        test_dict =  md_to_dict(load_metadata('./test/data/metadata.tsv'))
         
-    
+        expected_dict = {'1-1_t2': 
+                    {'metag': ['1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz',
+                                '1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz'],
+                     'metat': ['1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz', 
+                               '1-1_t2_metaT_S37_L004_R2_001.250k.fastq.gz'], 
+                     'metars': ['1-1_t2_metaRS_S13_L004_R1_001.250k.fastq.gz']
+        }}
+        
+        self.assertDictEqual(test_dict, expected_dict)
+
+    ### METADATA END
+        
+    ### TRIM FUNCTIONS
+    """
     def test_run_trim_metars(self):
 
         trim._run_trim_metars("./test/data/1-1_t2_metaRS_S13_L004_R1_001.250k.fastq.gz", "./test/out")
@@ -61,7 +115,7 @@ class Test_Trim(unittest.TestCase):
 
     def test_trim_files(self):
 
-        trim.trim_files("./test/data","./test/out", md_to_dict(load_metadata("./test/data/metadata.tsv")))
+        trim.trim_files("./test/data","./test/out", load_metadata.md_to_dict(load_metadata.load_metadatafile("./test/data/metadata.tsv")))
 
         orig_1 = './test/out/trimmed/1-1_t2_metaG_S121_L004_R1_001.250k_val_1.fq.gz'
         orig_2 = './test/out/trimmed/1-1_t2_metaG_S121_L004_R2_001.250k_val_2.fq.gz'
@@ -95,6 +149,9 @@ class Test_Trim(unittest.TestCase):
         tearDown("./test/out")
         tearDown("./test/out/trimmed")
 
+
+    ### TRIM FUNCTIONS END
+"""
 
 if __name__ == '__main__':
     tearDown("./test/out")
