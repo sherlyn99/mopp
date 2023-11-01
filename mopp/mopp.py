@@ -6,13 +6,7 @@ import pandas as pd
 from os import path
 
 from mopp._defaults import (DESC_MD, DESC_INPUT)
-from mopp.modules import load_metadata, my_func2
-
-timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-logging.basicConfig(
-    filename=f'md_main_{timestamp}.log',
-    level=logging.DEBUG, 
-    format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+from mopp.modules import load_metadata
 
 @click.group
 def mopp():
@@ -35,4 +29,10 @@ def workflow(metadata):
     #click.echo("This is the metag command")
 
 if __name__ == '__main__':
+   
+    # timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+    # logging.basicConfig(
+    # filename=f'md_main_{timestamp}.log',
+    # level=logging.DEBUG, 
+    # format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
     mopp()
