@@ -1,0 +1,157 @@
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: ./test/data/1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz
+Trimming mode: paired-end
+Trim Galore version: 0.6.10
+Cutadapt version: 4.4
+Number of cores used for trimming: 1
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Using Illumina adapter for trimming (count: 9166). Second best hit was smallRNA (count: 26)
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; auto-detected)
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 1 bp
+Minimum required sequence length for both reads before a sequence pair gets removed: 20 bp
+Running FastQC on the data once trimming has completed
+Output file will be GZIP compressed
+
+
+This is cutadapt 4.4 with Python 3.9.13
+Command line parameters: -j 1 -e 0.1 -q 20 -O 1 -a AGATCGGAAGAGC ./test/data/1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz
+Processing single-end reads on 1 core ...
+Finished in 5.189 s (20.755 µs/read; 2.89 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                 250,000
+Reads with adapters:                   101,304 (40.5%)
+Reads written (passing filters):       250,000 (100.0%)
+
+Total basepairs processed:    25,250,000 bp
+Quality-trimmed:                  91,323 bp (0.4%)
+Total written (filtered):     24,577,833 bp (97.3%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 101304 times
+
+Minimum overlap: 1
+No. of allowed errors:
+1-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 43.7%
+  C: 22.5%
+  G: 17.3%
+  T: 15.8%
+  none/other: 0.8%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+1	71417	62500.0	0	71417
+2	11397	15625.0	0	11397
+3	4505	3906.2	0	4505
+4	994	976.6	0	994
+5	206	244.1	0	206
+6	115	61.0	0	115
+7	67	15.3	0	67
+8	249	3.8	0	249
+9	188	1.0	0	187 1
+10	177	0.2	1	81 96
+11	358	0.1	1	152 206
+12	74	0.0	1	60 14
+13	205	0.0	1	126 79
+14	320	0.0	1	203 117
+15	404	0.0	1	272 132
+16	555	0.0	1	356 199
+17	1487	0.0	1	1119 368
+18	422	0.0	1	341 81
+19	363	0.0	1	275 88
+20	448	0.0	1	388 60
+21	681	0.0	1	545 136
+22	131	0.0	1	102 29
+23	504	0.0	1	368 136
+24	429	0.0	1	302 127
+25	265	0.0	1	221 44
+26	187	0.0	1	170 17
+27	106	0.0	1	92 14
+28	222	0.0	1	211 11
+29	184	0.0	1	168 16
+30	107	0.0	1	100 7
+31	106	0.0	1	102 4
+32	118	0.0	1	112 6
+33	92	0.0	1	90 2
+34	114	0.0	1	107 7
+35	79	0.0	1	72 7
+36	66	0.0	1	60 6
+37	86	0.0	1	82 4
+38	81	0.0	1	77 4
+39	35	0.0	1	30 5
+40	42	0.0	1	41 1
+41	64	0.0	1	60 4
+42	41	0.0	1	34 7
+43	57	0.0	1	56 1
+44	20	0.0	1	18 2
+45	35	0.0	1	34 1
+46	73	0.0	1	68 5
+47	36	0.0	1	35 1
+48	42	0.0	1	38 4
+49	120	0.0	1	112 8
+50	39	0.0	1	34 5
+51	20	0.0	1	16 4
+52	139	0.0	1	130 9
+53	18	0.0	1	17 1
+54	25	0.0	1	22 3
+55	24	0.0	1	22 2
+56	55	0.0	1	50 5
+57	52	0.0	1	50 2
+58	41	0.0	1	38 3
+59	18	0.0	1	13 5
+60	10	0.0	1	7 3
+61	12	0.0	1	9 3
+62	17	0.0	1	11 6
+63	30	0.0	1	28 2
+64	15	0.0	1	15
+65	44	0.0	1	35 9
+66	32	0.0	1	30 2
+67	37	0.0	1	31 6
+68	85	0.0	1	79 6
+69	107	0.0	1	94 13
+70	96	0.0	1	91 5
+71	37	0.0	1	36 1
+72	17	0.0	1	13 4
+73	18	0.0	1	18
+74	21	0.0	1	18 3
+75	69	0.0	1	66 3
+76	28	0.0	1	28
+77	51	0.0	1	45 6
+78	78	0.0	1	69 9
+79	92	0.0	1	83 9
+80	92	0.0	1	86 6
+81	36	0.0	1	33 3
+82	41	0.0	1	38 3
+83	40	0.0	1	36 4
+84	36	0.0	1	29 7
+85	47	0.0	1	43 4
+86	47	0.0	1	44 3
+87	35	0.0	1	33 2
+88	44	0.0	1	38 6
+89	38	0.0	1	37 1
+90	59	0.0	1	56 3
+91	154	0.0	1	145 9
+92	19	0.0	1	18 1
+93	16	0.0	1	14 2
+94	96	0.0	1	94 2
+95	38	0.0	1	36 2
+96	96	0.0	1	91 5
+97	73	0.0	1	67 6
+98	126	0.0	1	120 6
+99	16	0.0	1	11 5
+100	16	0.0	1	13 3
+101	738	0.0	1	238 500
+
+RUN STATISTICS FOR INPUT FILE: ./test/data/1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz
+=============================================
+250000 sequences processed in total
+

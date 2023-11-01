@@ -20,7 +20,7 @@ logging.basicConfig(
 # 3. following up on 2, should we delete trim_val1 and trim_val2 and fastqc report?
 # 4. consider reorganization of code so that metag, metat, and metars can be run separately
 
-def trim(indir, outdir, md_dict):
+def trim_files(indir, outdir, md_dict):
     outdir = os.path.join(outdir, 'trimmed')
     os.makedirs(outdir, exist_ok=True)
 
@@ -43,6 +43,7 @@ def _run_trim_paired(r1_file, r2_file, outdir):
         '--length', '20',
         '--fastqc'
     ]
+    print(commands)
 
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
@@ -59,7 +60,6 @@ def _run_trim_metars(r1_file, outdir):
         '--max_length', '75', 
         '--fastqc'
     ]
-
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     if p.returncode != 0:
@@ -67,8 +67,3 @@ def _run_trim_metars(r1_file, outdir):
     else:
         logging.info(f'{os.path.basename(r1_file)} trimming finished')
 
-if __name__ == '__main__':
-    md_dict = {'1-1_t2': {'metag': ['1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz', '1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz'], 'metat': ['1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz', '1-1_t2_metaT_S37_L004_R2_001.250k.fastq.gz'], 'metars': ['1-2_t2_metaRS_S14_L004_R1_001.250k.fastq.gz']}}
-    outdir = './test/data/out'
-    indir = './test/data'
-    trim(indir, outdir, md_dict)
