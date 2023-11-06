@@ -11,7 +11,7 @@ from pandas.testing import assert_frame_equal
 import unittest
 #from mopp._defaults import (DESC_MD, DESC_INPUT)
 from mopp.modules import trim
-from mopp.modules import load_metadata, md_to_dict
+from mopp.modules import (load_metadata, md_to_dict, validate_metadata)
 import logging
 
 def tearDown(dir):
@@ -64,19 +64,30 @@ class Test(unittest.TestCase):
         test_dict =  md_to_dict(load_metadata('./test/data/metadata.tsv'))
         
         expected_dict = {'1-1_t2': 
-                    {'metag': ['1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz',
+                    {'metaG': ['1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz',
                                 '1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz'],
-                     'metat': ['1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz', 
+                     'metaT': ['1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz', 
                                '1-1_t2_metaT_S37_L004_R2_001.250k.fastq.gz'], 
-                     'metars': ['1-1_t2_metaRS_S13_L004_R1_001.250k.fastq.gz']
+                     'metaRS': ['1-1_t2_metaRS_S13_L004_R1_001.250k.fastq.gz']
         }}
         
         self.assertDictEqual(test_dict, expected_dict)
 
+    def test_validate_metadata(self):
+
+        test_dict =  md_to_dict(load_metadata('./test/data/metadata.tsv'))
+
+        test_validation = validate_metadata(test_dict)
+        expected_validation = True
+
+        self.assertEqual(test_validation, expected_validation)
+
+
     ### METADATA END
         
     ### TRIM FUNCTIONS
-    """
+"""
+    
     def test_run_trim_metars(self):
 
         trim._run_trim_metars("./test/data/1-1_t2_metaRS_S13_L004_R1_001.250k.fastq.gz", "./test/out")
