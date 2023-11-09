@@ -2,8 +2,9 @@ import click
 import os
 import subprocess
 import pathlib
-
+import glob
 from mopp._defaults import (DESC_MD, DESC_INPUT, DESC_OUTPUT)
+from mopp.modules import load_metadata, md_to_dict
 
 import logging
 import time
@@ -23,18 +24,17 @@ logging.basicConfig(
 def align_files(indir, outdir, md_dict, INDEX):
     outdir = os.path.join(outdir, 'aligned')
     os.makedirs(outdir, exist_ok=True)
-    for file in os.listdir(indir):
-        _run_align(file, outdir, INDEX)
+    for identifer, omic_info_dict in md_dict.items():
+        for omic, files in omic_info_dict.items():
+            input_files = glob.glob(os.path.join(indir, f"{identifer}*{omic}*_cat_trimmed.fq.gz"))
+            print(input_files)
+            for input in input_files:
+                _run_align(input, outdir, INDEX)
 
 
 def _run_align(file, outdir, INDEX):
-    newname = file.split("/")[-1]
-
-    if "_trimmed" in file:
-        newname = newname.split("_trimmed")[0]
-    elif "_concat" in file:
-        newname = newname.split("_concat")[0]
-
+    newname = file.split("/")[-1].split(".fq.gz")[0]
+    print(newname)
     commands = [
         'bowtie2',
         '-U', file,
@@ -46,6 +46,7 @@ def _run_align(file, outdir, INDEX):
         '2>', os.path.join(outdir, newname + "_WoL_subset.bow")
     ]
     
+    print(' '.join(commands))
 
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
@@ -56,5 +57,6 @@ def _run_align(file, outdir, INDEX):
 
 
 if __name__ == '__main__':
-    _run_align_paired("./test/data/out_manual/trimmed/1-1_t2_metaT_S37_L004_R1_001.250k_val_1.fq.gz", './test/data/out_manual/trimmed/1-1_t2_metaT_S37_L004_R2_001.250k_val_2.fq.gz',  './test/out', '/home/kz/Pictures/ecoli_index')
+    align_files("./test/out/trimmed", './test/out', md_to_dict(load_metadata('./test/data/metadata.tsv')), './wol_subset_index/wol_subset0.1_index')
+    #_run_align_paired("./test/data/out_manual/trimmed/1-1_t2_metaT_S37_L004_R1_001.250k_val_1.fq.gz", './test/data/out_manual/trimmed/1-1_t2_metaT_S37_L004_R2_001.250k_val_2.fq.gz',  './test/out', '/home/kz/Pictures/ecoli_index')
 

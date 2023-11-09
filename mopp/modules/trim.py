@@ -28,6 +28,7 @@ def trim_files(indir, outdir, md_dict):
     for identifer, omic_info_dict in md_dict.items():
         for omic, files in omic_info_dict.items():
             r1_file = os.path.join(indir, omic_info_dict[omic][0])
+            print(indir, omic)
             if omic == 'metaRS':
                 print(f'{r1_file} detected')
                 _run_trim_metars(r1_file, outdir)
@@ -72,17 +73,13 @@ def _concat_paired(dir, md_dict):
 
     for identifer, omic_info_dict in md_dict.items():
         for omic, files in omic_info_dict.items():
-
             commands = [
-                f"cat {dir}/{identifer}*metaG*.fq.gz >{dir}/{identifer}_metaG_cat_trimmed.fq.gz"
+                f"cat {dir}/{identifer}*{omic}*.fq.gz >{dir}/{identifer}_{omic}_cat_trimmed.fq.gz"
             ]
-    
-    p = subprocess.Popen(commands, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, error = p.communicate()
-    print(output, error)
-
+            p = subprocess.Popen(commands, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output, error = p.communicate()
 
 if __name__ == '__main__':
-    trim_files("./test/data/", './test/out',  md_to_dict(load_metadata('./test/data/metadata.tsv')))
-    #_concat_paired('./test/out/trimmed', md_to_dict(load_metadata('./test/data/metadata.tsv')))
+    #trim_files("./test/data/", './test/out',  md_to_dict(load_metadata('./test/data/metadata.tsv')))
+    _concat_paired('./test/out/trimmed', md_to_dict(load_metadata('./test/data/metadata.tsv')))
 
