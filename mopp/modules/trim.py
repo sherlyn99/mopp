@@ -4,6 +4,7 @@ import subprocess
 import pathlib
 
 from mopp._defaults import (DESC_MD, DESC_INPUT, DESC_OUTPUT)
+from mopp.modules import load_metadata, md_to_dict
 
 import logging
 import time
@@ -27,13 +28,16 @@ def trim_files(indir, outdir, md_dict):
     for identifer, omic_info_dict in md_dict.items():
         for omic, files in omic_info_dict.items():
             r1_file = os.path.join(indir, omic_info_dict[omic][0])
-            if omic == 'metars':
+            print(indir, omic)
+            if omic == 'metaRS':
                 print(f'{r1_file} detected')
                 _run_trim_metars(r1_file, outdir)
+
             else:
                 r2_file = os.path.join(indir, omic_info_dict[omic][1])
                 print(f'{r1_file} and {r2_file} detected')
                 _run_trim_paired(r1_file, r2_file, outdir)
+    _concat_paired(outdir,md_dict)
 
 def _run_trim_paired(r1_file, r2_file, outdir):
     commands = [
@@ -43,8 +47,6 @@ def _run_trim_paired(r1_file, r2_file, outdir):
         '--length', '20',
         '--fastqc'
     ]
-    print(commands)
-
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     if p.returncode != 0:
@@ -66,4 +68,18 @@ def _run_trim_metars(r1_file, outdir):
         logging.error(f'{os.path.basename(r1_file)} trimming failed with code {p.returncode} and error {error}')
     else:
         logging.info(f'{os.path.basename(r1_file)} trimming finished')
+
+def _concat_paired(dir, md_dict):
+
+    for identifer, omic_info_dict in md_dict.items():
+        for omic, files in omic_info_dict.items():
+            commands = [
+                f"cat {dir}/{identifer}*{omic}*.fq.gz >{dir}/{identifer}_{omic}_cat_trimmed.fq.gz"
+            ]
+            p = subprocess.Popen(commands, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output, error = p.communicate()
+
+if __name__ == '__main__':
+    #trim_files("./test/data/", './test/out',  md_to_dict(load_metadata('./test/data/metadata.tsv')))
+    _concat_paired('./test/out/trimmed', md_to_dict(load_metadata('./test/data/metadata.tsv')))
 
