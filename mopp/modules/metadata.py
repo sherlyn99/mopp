@@ -1,7 +1,9 @@
-import pandas as pd
-import logging
 import time
+import logging
+import pandas as pd
 from collections import defaultdict
+
+logger = logging.getLogger("mopp")
 
 
 def load_metadata(md_path):
@@ -44,27 +46,23 @@ def _validate_metadata(md_df):
 
 def _md_to_dict(md_df):
     """Stores metadata in a dictionary."""
-    md_dict = defaultdict(str)
+    md_dict = {}
     for _, row in md_df.iterrows():
-        md_dict[row["label"]] = row["sample_name"]
-    logger.info("Metadata loaded.")
+        sample_name, identifier, omic, strand = (
+            row["sample_name"],
+            row["identifier"],
+            row["omic"],
+            row["strand"],
+        )
+        if identifier not in md_dict:
+            md_dict[identifier] = {"metaG": [-1, -1], "metaT": [-1, -1], "metaRS": [-1]}
+        if strand == "r1":
+            md_dict[identifier][omic][0] = sample_name
+        elif strand == "r2":
+            md_dict[identifier][omic][1] = sample_name
+    logger.info("Metadata loaded")
     return md_dict
 
 
 if __name__ == "__main__":
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-
-    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-    formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-
-    filer_handler = logging.FileHandler(f"metadata_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-
-    test_file = "./test/data/metadata.tsv"
-    res = load_metadata(test_file)
+    load_metadata()

@@ -1,0 +1,104 @@
+import unittest
+import pandas as pd
+from pandas.testing import assert_frame_equal
+from mopp.modules.metadata import (
+    _validate_metadata,
+    _md_to_dict,
+)
+
+
+class Test(unittest.TestCase):
+    # module: metadata
+
+    def test_validate_metadata(self):
+        # md_df with correct format
+        test_md_df = pd.DataFrame(
+            {
+                "sample_name": [
+                    "1-1_t2_metaRS_S13_L004_R1_001.250k.fastq.gz",
+                    "1-1_t2_metaT_S37_L004_R2_001.250k.fastq.gz",
+                    "1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz",
+                    "1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz",
+                    "1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz",
+                ],
+                "identifier": ["1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2"],
+                "omic": ["metaRS", "metaT", "metaT", "metaG", "metaG"],
+                "strand": ["R1", "R2", "R1", "R2", "R1"],
+            }
+        )
+
+        expected_md_df = pd.DataFrame(
+            {
+                "sample_name": [
+                    "1-1_t2_metaRS_S13_L004_R1_001.250k.fastq.gz",
+                    "1-1_t2_metaT_S37_L004_R2_001.250k.fastq.gz",
+                    "1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz",
+                    "1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz",
+                    "1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz",
+                ],
+                "identifier": ["1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2"],
+                "omic": ["metaRS", "metaT", "metaT", "metaG", "metaG"],
+                "strand": ["R1", "R2", "R1", "R2", "R1"],
+                "label": [
+                    "1-1_t2|metaRS|R1",
+                    "1-1_t2|metaT|R2",
+                    "1-1_t2|metaT|R1",
+                    "1-1_t2|metaG|R2",
+                    "1-1_t2|metaG|R1",
+                ],
+            }
+        )
+        actual_md_df = _validate_metadata(test_md_df)
+        assert_frame_equal(expected_md_df, actual_md_df)
+
+        # md_df with incorrect number of columns
+        test_md_df_wrongncol = pd.DataFrame(
+            {
+                "sample_name": [
+                    "1-1_t2_metaRS_S13_L004_R1_001.250k.fastq.gz",
+                    "1-1_t2_metaT_S37_L004_R2_001.250k.fastq.gz",
+                    "1-1_t2_metaT_S37_L004_R1_001.250k.fastq.gz",
+                    "1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz",
+                    "1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz",
+                ],
+                "identifier": ["1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2"],
+                "omic": ["metaRS", "metaT", "metaT", "metaG", "metaG"],
+            }
+        )
+        with self.assertRaises(ValueError):
+            _validate_metadata(test_md_df_wrongncol)
+
+    def test_md_to_dict(self):
+        test_md_df = pd.DataFrame(
+            {
+                "sample_name": [
+                    "sample1_R1",
+                    "sample1_R2",
+                    "sample2_R1",
+                    "sample2_R2",
+                    "sample3",
+                ],
+                "identifier": ["id1", "id1", "id2", "id2", "id3"],
+                "omic": ["metaG", "metaG", "metaT", "metaT", "metaRS"],
+                "strand": ["r1", "r2", "r1", "r2", "r1"],
+            }
+        )
+        expected_dict = {
+            "id1": {
+                "metaG": ["sample1_R1", "sample1_R2"],
+                "metaT": [-1, -1],
+                "metaRS": [-1],
+            },
+            "id2": {
+                "metaG": [-1, -1],
+                "metaT": ["sample2_R1", "sample2_R2"],
+                "metaRS": [-1],
+            },
+            "id3": {"metaG": [-1, -1], "metaT": [-1, -1], "metaRS": ["sample3"]},
+        }
+        actual_dict = _md_to_dict(test_md_df)
+        self.assertEqual(expected_dict, actual_dict)
+
+
+if __name__ == "__main__":
+    unittest.main()

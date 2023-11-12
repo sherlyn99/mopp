@@ -1,10 +1,14 @@
-import click
-from glob import glob
 import time
+import click
 import logging
-from os import path
+from glob import glob
 from mopp._defaults import MSG_WELCOME, MSG_WELCOME_WORKFLOW, DESC_MD, DESC_INPUT
-from mopp.modules.metadata import load_metadata
+from mopp.modules.trim import trim_files
+
+
+logger = logging.getLogger("mopp")
+timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 
 
 @click.group(help=MSG_WELCOME)
@@ -35,9 +39,19 @@ def mopp():
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-o", "--output_dir", required=True, help=DESC_MD)
 def trim(input_dir, output_dir, metadata):
-    md_dict = load_metadata(metadata)
-    trim.trim_files(input_dir, output_dir, md_dict)
-    logger.info("Trim finished")
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(f"mopp_{timestamp}.log")
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    try:
+        trim_files(input_dir, output_dir, metadata)
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}", exc_info=True)
+    return
 
 
 # @mopp.command()
@@ -51,18 +65,4 @@ def trim(input_dir, output_dir, metadata):
 
 
 if __name__ == "__main__":
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-
-    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-    formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-
-    filer_handler = logging.FileHandler(f"main_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-
     mopp()
