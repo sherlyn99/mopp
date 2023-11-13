@@ -14,15 +14,35 @@ cases of this pipeline:
 """
 MSG_WELCOME_WORKFLOW = """
 Insert introduction to complete workflow & paper citation
+
+This is the central tool to MOPP, where you can analyze all omics at the same time.
+With your provided metadata, the tool is able to properly process metagenomic, metatranscriptomic,
+and metatranslatomic data to produce count tables that classify by genus and stratify species by
+uniref annotation. 
+
+The workflow takes the following steps:
+
+1) Trim adapters off of all sequencing files.
+
+2) Align metagenomic files to the entire Web of Life Database and 
+   calculate genome coverages. A subset index of the Web of Life Database
+   is created based on a desired genome coverage threshold.
+   
+4) Align metagenomic, metatranscriptomic, and metatranslatomic data to the subset index.
+   
+5) Generate genus classification and Species|Uniref stratification count tables using Woltka.
+
+[Insert paper citation here]
+
 """
 
 # descriptions
-DESC_MD = "Sample metadata file in tsv format. See README for a template."
-DESC_INPUT = "Directory of metaG/metaT/metaRS files."
-DESC_INPUT_SAM = "Directory of metaG/metaT/metaRS trimmed files."
-DESC_OUTPUT = "Output directory. Will create if does not exist. Will erase if exists."
-DESC_INDEX = "Genome index."
-DESC_NTHREADS = "Number of threads. Default: 4."
+DESC_MD = "Sample metadata file in tsv format. See README for a template. [required]"
+DESC_INPUT = "Input: Directory of metaG/metaT/metaRS files. [required]"
+DESC_INPUT_SAM = "Input: Directory of metaG/metaT/metaRS trimmed files. [required]"
+DESC_OUTPUT = "Output: Directory name to generate or overwite. [required]"
+DESC_INDEX = "Genome index. [required]"
+DESC_NTHREADS = "Number of threads. [default: 4]."
 
 
 # try:
