@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 from mopp.modules.utils import clear_folder
 
+
 logger = logging.getLogger("mopp")
 
 
@@ -17,7 +18,7 @@ def align_files(indir, outdir, INDEX, nthreads):
     suffix = INDEX.split("/")[-1]
 
     for filepath in input_files:
-        _run_align(filepath, suffix, outdir, INDEX, nthreads)
+        _run_align(filepath, suffix, outdir_aligned, INDEX, nthreads)
 
 
 def _run_align(filepath, suffix, outdir, INDEX, nthreads):
