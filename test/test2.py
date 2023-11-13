@@ -5,11 +5,11 @@ from mopp.modules.metadata import (
     _validate_metadata,
     _md_to_dict,
 )
+from mopp.modules.align import _commands_generation_bowtie2
 
 
 class Test(unittest.TestCase):
     # module: metadata
-
     def test_validate_metadata(self):
         # md_df with correct format
         test_md_df = pd.DataFrame(
@@ -98,6 +98,23 @@ class Test(unittest.TestCase):
         }
         actual_dict = _md_to_dict(test_md_df)
         self.assertEqual(expected_dict, actual_dict)
+
+    # module: align
+    def test_commands_generation_bowtie2n(self):
+        filepath = "./test/data/out2/cat/1-1_t2_metaG_trimmed.fq.gz"
+        identifier = "1-1_t2_metaG_trimmed"
+        suffix = "WoL30"
+        outdir = "./test/data/out2/aligned"
+        INDEX = "./test/data/wol_subset_index/wol_subset0.1_index"
+        nthreads = 4
+
+        expected_commands = "bowtie2 -U ./test/data/out2/cat/1-1_t2_metaG_trimmed.fq.gz -x ./test/data/wol_subset_index/wol_subset0.1_index -p 4 --no-unal --no-head -S test/data/out2/aligned/1-1_t2_metaG_trimmed_WoL30.sam 2> test/data/out2/aligned/1-1_t2_metaG_trimmed_WoL30.bow"
+        actual_commands = " ".join(
+            _commands_generation_bowtie2(
+                filepath, identifier, suffix, outdir, INDEX, nthreads
+            )
+        )
+        self.assertEqual(expected_commands, actual_commands)
 
 
 if __name__ == "__main__":

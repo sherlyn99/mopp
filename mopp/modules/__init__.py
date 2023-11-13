@@ -1,6 +1,11 @@
 from .metadata import *
 from .trim import *
 from .align import *
+
+# from .coverage import *
+# from .index import *
+# from .featureTable import *
+from .utils import *
 from .mod3 import *
 
 # import time

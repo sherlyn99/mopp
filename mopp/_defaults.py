@@ -1,5 +1,5 @@
 # welcome messages
-MSG_WELCOME="""
+MSG_WELCOME = """
 Welcome to MOPP - Multiomics Processing Pipeline!
 
 This tool helps with processing multiomics sequencing data including metagenomics, 
@@ -12,15 +12,17 @@ cases of this pipeline:
 
 (3) To run a single analysis step, run `mopp trim --help`.etc
 """
-MSG_WELCOME_WORKFLOW="""
+MSG_WELCOME_WORKFLOW = """
 Insert introduction to complete workflow & paper citation
 """
 
 # descriptions
-DESC_MD='Sample metadata file in tsv format. See README for a template.'
-DESC_INPUT='Directory of metaG/metaT/metaRS files.'
-DESC_OUTPUT=('Output directory. Will create if does not exist. ',
-            'Will append if exists')
+DESC_MD = "Sample metadata file in tsv format. See README for a template."
+DESC_INPUT = "Directory of metaG/metaT/metaRS files."
+DESC_INPUT_SAM = "Directory of metaG/metaT/metaRS trimmed files."
+DESC_OUTPUT = "Output directory. Will create if does not exist. Will erase if exists."
+DESC_INDEX = "Genome index."
+DESC_NTHREADS = "Number of threads. Default: 4."
 
 
 # try:

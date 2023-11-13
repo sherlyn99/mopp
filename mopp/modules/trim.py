@@ -1,8 +1,9 @@
-import shutil
 import logging
 import subprocess
 from pathlib import Path
+from mopp.modules.utils import clear_folder
 from mopp.modules.metadata import load_metadata
+
 
 logger = logging.getLogger("mopp")
 
@@ -13,14 +14,13 @@ def trim_files(indir, outdir, md_path):
 
     # create ./trimmed
     # if trimmed already exists in outdir, make sure it is empty
-    outdir = Path(outdir) / "trimmed"
-    outdir.mkdir(parents=True, exist_ok=True)
+    outdir_trimmed = Path(outdir) / "trimmed"
+    outdir_trimmed.mkdir(parents=True, exist_ok=True)
+    outdir_cat = Path(outdir) / "cat"
+    outdir_cat.mkdir(parents=True, exist_ok=True)
 
-    for item in outdir.iterdir():
-        if item.is_file():
-            item.unlink()
-        if item.is_dir():
-            shutil.rmtree(item)
+    clear_folder(outdir_trimmed)
+    clear_folder(outdir_cat)
 
     # trim files
     for identifier, omic_dict in md_dict.items():
@@ -28,18 +28,18 @@ def trim_files(indir, outdir, md_path):
             r1_file = Path(indir) / omic_dict[omic][0]
             if omic == "metaRS":
                 logger.info(f"{r1_file.name} trimming started")
-                _run_trim_metars(r1_file, outdir)
-                _rename_files(outdir, identifier, omic)
+                _run_trim_metars(r1_file, outdir_trimmed)
+                _rename_files(outdir_trimmed, outdir_cat, identifier, omic)
             else:
                 r2_file = Path(indir) / omic_dict[omic][1]
                 logger.info(f"{r1_file.name} & R2 trimming started")
-                _run_trim_paired(r1_file, r2_file, outdir)
-                _cat_paired(outdir, identifier, omic)
+                _run_trim_paired(r1_file, r2_file, outdir_trimmed)
+                _cat_paired(outdir_trimmed, outdir_cat, identifier, omic)
 
 
-def _rename_files(indir, identifier, omic):
+def _rename_files(indir, outdir, identifier, omic):
     commands = [
-        f"mv {indir}/{identifier}*{omic}*trimmed.fq.gz {indir}/{identifier}_{omic}_trimmed.fq.gz"
+        f"mv {indir}/{identifier}*{omic}*trimmed.fq.gz {outdir}/{identifier}_{omic}_trimmed.fq.gz"
     ]
     p = subprocess.Popen(
         commands, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -95,9 +95,9 @@ def _run_trim_metars(r1_file, outdir):
         logger.info(f"{r1_file.name} trimming finished")
 
 
-def _cat_paired(indir, identifier, omic):
+def _cat_paired(indir, outdir, identifier, omic):
     commands = [
-        f"cat {indir}/{identifier}*{omic}*.fq.gz > {indir}/{identifier}_{omic}_trimmed.fq.gz"
+        f"cat {indir}/{identifier}*{omic}*.fq.gz > {outdir}/{identifier}_{omic}_trimmed.fq.gz"
     ]
     p = subprocess.Popen(
         commands, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
