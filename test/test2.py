@@ -6,6 +6,7 @@ from mopp.modules.metadata import (
     _md_to_dict,
 )
 from mopp.modules.align import _commands_generation_bowtie2
+from mopp.modules.coverages import _commands_generation_coverages
 
 
 class Test(unittest.TestCase):
@@ -100,7 +101,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expected_dict, actual_dict)
 
     # module: align
-    def test_commands_generation_bowtie2n(self):
+    def test_commands_generation_bowtie2(self):
         filepath = "./test/data/out2/cat/1-1_t2_metaG_trimmed.fq.gz"
         identifier = "1-1_t2_metaG_trimmed"
         suffix = "WoL30"
@@ -114,6 +115,16 @@ class Test(unittest.TestCase):
                 filepath, identifier, suffix, outdir, INDEX, nthreads
             )
         )
+        self.assertEqual(expected_commands, actual_commands)
+
+    # module:coverages
+    def test_commands_generation_zebra(self):
+        zebra_path = '/home/y1weng/zebra_filter'
+        indir = './test/data/out2/aligned/'
+        outdir = './test/data/out2'
+
+        expected_commands = "python /home/y1weng/zebra_filter/calculate_coverages.py -i test/data/out2/aligned -o test/data/out2/calculate_coverages.tsv -d /home/y1weng/zebra_filter/databases/WoL/metadata.tsv"
+        actual_commands = " ".join(_commands_generation_coverages(zebra_path, indir, outdir))
         self.assertEqual(expected_commands, actual_commands)
 
 
