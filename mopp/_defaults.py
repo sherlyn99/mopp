@@ -13,8 +13,6 @@ cases of this pipeline:
 (3) To run a single analysis step, run `mopp trim --help`.etc
 """
 MSG_WELCOME_WORKFLOW = """
-Insert introduction to complete workflow & paper citation
-
 This is the central tool to MOPP, where you can analyze all omics at the same time.
 With your provided metadata, the tool is able to properly process metagenomic, metatranscriptomic,
 and metatranslatomic data to produce count tables that classify by genus and stratify species by
@@ -39,10 +37,16 @@ The workflow takes the following steps:
 # descriptions
 DESC_MD = "Sample metadata file in tsv format. See README for a template. [required]"
 DESC_INPUT = "Input: Directory of metaG/metaT/metaRS files. [required]"
-DESC_INPUT_SAM = "Input: Directory of metaG/metaT/metaRS trimmed files. [required]"
+DESC_INPUT_SAM = "Input: Directory of metaG/metaT/metaRS samfiles. [required]"
 DESC_OUTPUT = "Output: Directory name to generate or overwite. [required]"
 DESC_INDEX = "Genome index. [required]"
 DESC_NTHREADS = "Number of threads. [default: 4]."
+# module: align
+DESC_PATTERN = "File patterns to include for alignment"
+# module: features
+DESC_RANK = "Taxonomic rank."
+DESC_STRAT = "Enables uniref stratification. Applies to all ranks. Default: off"
+DESC_WOLTKA_DB = "Path to woltka database."
 
 
 # try:

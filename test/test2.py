@@ -1,3 +1,4 @@
+import io
 import unittest
 import pandas as pd
 from pandas.testing import assert_frame_equal
@@ -7,6 +8,11 @@ from mopp.modules.metadata import (
 )
 from mopp.modules.align import _commands_generation_bowtie2
 from mopp.modules.coverages import _commands_generation_coverages
+from mopp.modules.index import _cov_filter, _commands_generation_bt2build
+from mopp.modules.features import (
+    _commands_generation_woltka,
+    _commands_stratification_generation_woltka,
+)
 
 
 class Test(unittest.TestCase):
@@ -117,15 +123,123 @@ class Test(unittest.TestCase):
         )
         self.assertEqual(expected_commands, actual_commands)
 
-    # module:coverages
+    # module: coverages
     def test_commands_generation_zebra(self):
-        zebra_path = '/home/y1weng/zebra_filter'
-        indir = './test/data/out2/aligned/'
-        outdir = './test/data/out2'
+        zebra_path = "/home/y1weng/zebra_filter"
+        indir = "./test/data/out2/aligned/"
+        outdir = "./test/data/out2"
 
-        expected_commands = "python /home/y1weng/zebra_filter/calculate_coverages.py -i test/data/out2/aligned -o test/data/out2/calculate_coverages.tsv -d /home/y1weng/zebra_filter/databases/WoL/metadata.tsv"
-        actual_commands = " ".join(_commands_generation_coverages(zebra_path, indir, outdir))
+        expected_commands = "python /home/y1weng/zebra_filter/calculate_coverages.py -i test/data/out2/aligned -o test/data/out2/coverages.tsv -d /home/y1weng/zebra_filter/databases/WoL/metadata.tsv"
+        actual_commands = " ".join(
+            _commands_generation_coverages(zebra_path, indir, outdir)
+        )
         self.assertEqual(expected_commands, actual_commands)
+
+    # module: index
+    def test_cov_filter(self):
+        # Use StringIO to simulate a file-like object
+        cov_content = """
+        gotu\tcoverage_ratio\ngenome1\t0.8\ngenome2\t0.6\ngenome3\t0.9\ngenome4\t0.5
+        """
+        cov_file = io.StringIO(cov_content.strip())
+        cutoff_value = 0.7
+
+        # Expected results
+        expected_cov_filtered_content = """
+        gotu\tcoverage_ratio\ngenome3\t0.9\ngenome1\t0.8
+        """
+        expected_cov_filtered = pd.read_csv(
+            io.StringIO(expected_cov_filtered_content.strip()), sep="\t"
+        )
+        expected_gotu_filtered = pd.Series(["genome3", "genome1"], name="gotu")
+
+        # Actual results
+        actual_cov_filtered, actual_gotu_filtered = _cov_filter(cov_file, cutoff_value)
+
+        # Reset indices before comparison
+        expected_cov_filtered.reset_index(drop=True, inplace=True)
+        actual_cov_filtered.reset_index(drop=True, inplace=True)
+        expected_gotu_filtered.reset_index(drop=True, inplace=True)
+        actual_gotu_filtered.reset_index(drop=True, inplace=True)
+
+        # Comparison
+        pd.testing.assert_frame_equal(expected_cov_filtered, actual_cov_filtered)
+        pd.testing.assert_series_equal(expected_gotu_filtered, actual_gotu_filtered)
+
+    def test_commands_generation_bt2build(self):
+        output_fna_file = "/path/to/genomes.fna"
+        output_bt2index = "/path/to/index"
+        prefix = "my_index"
+
+        actual_commands = _commands_generation_bt2build(
+            output_fna_file, output_bt2index, prefix
+        )
+
+        expected_commands = (
+            "bowtie2-build /path/to/genomes.fna /path/to/index/my_index --large-index"
+        )
+
+        # Assertions
+        self.assertEqual(expected_commands, " ".join(actual_commands))
+
+    # module: features
+    def test_commands_generation_woltka(self):
+        rank = "species"
+        indir = "/path/to/indir"
+        outdir = "/path/to/outdir"
+        db = "/path/to/db"
+        actual_commands = _commands_generation_woltka(rank, indir, outdir, db)
+        expected_commands = [
+            "woltka",
+            "classify",
+            "--input",
+            "/path/to/indir",
+            "--map",
+            "/path/to/db/taxonomy/taxid.map",
+            "--nodes",
+            "/path/to/db/taxonomy/nodes.dmp",
+            "--names",
+            "/path/to/db/taxonomy/names.dmp",
+            "--rank",
+            "species",
+            "--name-as-id",
+            "--outmap",
+            "/path/to/outdir/species_level/mapdir",
+            "--output",
+            "/path/to/outdir/species_level/counts.tsv",
+        ]
+        self.assertEqual(actual_commands, expected_commands)
+
+    def test_commands_stratification_generation_woltka(self):
+        rank = "species"
+        indir = "/path/to/indir"
+        outdir = "/path/to/outdir"
+        db = "/path/to/db"
+        commands = _commands_stratification_generation_woltka(rank, indir, outdir, db)
+        expected_commands = [
+            "woltka",
+            "classify",
+            "--input",
+            "/path/to/indir",
+            "--coords",
+            "/path/to/db/proteins/coords.txt.xz",
+            "--map",
+            "/path/to/db/function/uniref/uniref.map.xz",
+            "--map",
+            "/path/to/db/function/go/process.map.xz",
+            "--map-as-rank",
+            "--rank",
+            "process",
+            "-n",
+            "/path/to/db/function/uniref/uniref.name.xz",
+            "-r",
+            "uniref",
+            "--stratify",
+            "/path/to/outdir/species_level/mapdir",
+            "--output",
+            "/path/to/outdir/species_level/counts_stratified.tsv",
+        ]
+        self.assertEqual(commands, expected_commands)
 
 
 if __name__ == "__main__":
