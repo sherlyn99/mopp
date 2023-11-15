@@ -1,7 +1,7 @@
 import logging
 import subprocess
 from pathlib import Path
-from mopp.modules.utils import clear_folder
+from mopp.modules.utils import create_folder
 from mopp.modules.metadata import load_metadata
 
 
@@ -13,26 +13,22 @@ def trim_files(indir, outdir, md_path):
     md_dict = load_metadata(md_path)
 
     # create ./trimmed
-    # if trimmed already exists in outdir, make sure it is empty
-    outdir_trimmed = Path(outdir) / "trimmed"
-    outdir_trimmed.mkdir(parents=True, exist_ok=True)
-    outdir_cat = Path(outdir) / "cat"
-    outdir_cat.mkdir(parents=True, exist_ok=True)
-
-    clear_folder(outdir_trimmed)
-    clear_folder(outdir_cat)
+    # if outdir already existed, will clear content
+    outdir_cat = Path(outdir)
+    outdir_trimmed = Path(outdir_cat) / "trimmed_reports"
+    create_folder(outdir_cat)
+    create_folder(outdir_trimmed)
 
     # trim files
     for identifier, omic_dict in md_dict.items():
         for omic in omic_dict.keys():
             r1_file = Path(indir) / omic_dict[omic][0]
             if omic == "metaRS":
-                logger.info(f"{r1_file.name} trimming started")
                 _run_trim_metars(r1_file, outdir_trimmed)
                 _rename_files(outdir_trimmed, outdir_cat, identifier, omic)
             else:
                 r2_file = Path(indir) / omic_dict[omic][1]
-                logger.info(f"{r1_file.name} & R2 trimming started")
+
                 _run_trim_paired(r1_file, r2_file, outdir_trimmed)
                 _cat_paired(outdir_trimmed, outdir_cat, identifier, omic)
 
@@ -64,6 +60,7 @@ def _run_trim_paired(r1_file, r2_file, outdir):
         "20",
         "--fastqc",
     ]
+    logger.info(f"{r1_file.name} & R2 trimming started")
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     if p.returncode != 0:
@@ -85,6 +82,7 @@ def _run_trim_metars(r1_file, outdir):
         "75",
         "--fastqc",
     ]
+    logger.info(f"{r1_file.name} trimming started")
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     if p.returncode != 0:
