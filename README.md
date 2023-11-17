@@ -45,7 +45,12 @@ The workflow takes the following steps:
 
 usage: `mopp trim -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)>`
 
-example: `mopp trim -i ./test/data -o ./test/data/out2/trimmed -m ./test/data/metadata.tsv`
+example: 
+```
+mopp trim -i ./test/data \
+-o ./test/data/out2/trimmed \
+-m ./test/data/metadata.tsv
+```
 
 `mopp trim` trims sequencing data provided in the input directory. The metadata indicates which type of data it is (metaG, metaT, or metaRS) so that optimal trimming parameters can be selected case-by-case. 
 
