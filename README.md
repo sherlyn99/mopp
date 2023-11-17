@@ -1,6 +1,6 @@
 <h1> <p align ="center"> Welcome to MOPP - Multiomics Processing Pipeline! </p> </h1>
 
-***
+
 
 This tool helps with processing multiomics sequencing data including metagenomics, 
 metatranscriptomics, and metatranslatomics data. There are three typical use 
@@ -19,6 +19,8 @@ cases of this pipeline:
 <h4> <p align ="center"> mopp workflow </p> </h4>
 
 usage: `mopp workflow -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -x <Index> -t <Num Threads> -z <zebra-filter Path> -c <Cutoff> -ref <Reference Database> -p <Index Prefix>`
+
+example: `mopp workflow -i ./test/data -o ./test/data/out3/ -m ./test/data/metadata.tsv -x ./test/data/wol_subset_index/wol_subset0.1_index -t 4 -z /home/y1weng/zebra_filter -c 0.1 -ref ./test/data/wol_subset_index/wol_above10.concat.fna -p myTest -r genus,species -db /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 -strat -r genus,species`
 
 This is the central tool to MOPP, where you can analyze all omics at the same time.
 With your provided metadata, the tool is able to properly process metagenomic, metatranscriptomic,
@@ -43,11 +45,20 @@ The workflow takes the following steps:
 
 usage: `mopp trim -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)>`
 
+example: `mopp trim -i ./test/data -o ./test/data/out2/trimmed -m ./test/data/metadata.tsv`
+
+`mopp trim` trims sequencing data provided in the input directory. The metadata indicates which type of data it is (metaG, metaT, or metaRS) so that optimal trimming parameters can be selected case-by-case. 
+
+
 <h2> <p align ="center"> </p> </h2>
 
 <h4> <p align ="center"> mopp align </p> </h4>
 
-usage: `mopp align -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -o <Pattern> -x <Index> -t <Num Threads>`
+usage: `mopp align -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -p <Pattern> -x <Index> -t <Num Threads>`
+
+example `mopp align -i ./test/data/out2/trimmed -p *.fq.gz -o ./test/data/out2/aligned -p trimmed -x ./test/data/wol_subset_index/wol_subset0.1_index -t 64`
+
+`mopp align` aligns the sequencing data provided in the input directory to the reference index. Providing a file pattern `-p` allows for specification of files with certain name patterns. Allocating more threads to this command `-t` can reduce processing time.
 
 <h2> <p align ="center"> </p> </h2>
 
@@ -55,14 +66,26 @@ usage: `mopp align -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)
 
 usage: `mopp cov -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -z <zebra-filter Path>`
 
+example: `mopp cov -i ./test/data/out2/aligned/samfiles -o ./test/data/out2/cov -z /home/y1weng/zebra_filter`
+
+`mopp cov` uses zebra-filter's calculate_coverages.py to produce a spreadsheet with calculated genome coverages. This is essential for selecting an optimal coverage threshold when generating a subset index.
+
 <h2> <p align ="center"> </p> </h2>
 
 <h4> <p align ="center"> mopp generate_index </p> </h4>
 
 usage: `mopp generate_index -i <Input Coverage> -o <Output Directory> -c <Cutoff> -ref <Reference Database> -p <Prefix>`
 
+example : `mopp align -i ./test/data/coverages.txt -o ./test/data/out2/ -c 0.2 -x /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 -p 0.2_cutoff_index`
+
+`mopp generate_index` creates a subset index from a larger database, given a cutoff threshold. For example, `-c 0.2` would generate a subset that only contains genomes with 20% or greater coverage.
+
 <h2> <p align ="center"> </p> </h2>
 
 <h4> <p align ="center"> mopp feature_table </p> </h4>
 
-usage: `mopp feature_table -i <Input Coverage> -o <Output Directory> -db <Woltka Database> -strat <Stratification>`
+usage: `mopp feature_table -i <Input Directory> -o <Output Directory> -db <Woltka Database> -strat <Stratification>`
+
+example: `mopp feature-table -i ./test/data/out2/aligned/samfiles -o ./test/data/out2/features -db /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 -strat -r genus,species`
+
+`mopp feature_table` is the culmination of the processing pipeline. Given the processed sequencing files, the command produces a feature count table using the Woltka database. Stratification options include `species`, `genus`, and `genus,species`
