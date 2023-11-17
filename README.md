@@ -1,6 +1,6 @@
 <h1> <p align ="center"> Welcome to MOPP - Multiomics Processing Pipeline! </p> </h1>
 
-
+<h3> <p align = "center"> How can MOPP help me? </p> </h3>
 
 This tool helps with processing multiomics sequencing data including metagenomics, 
 metatranscriptomics, and metatranslatomics data. There are three typical use 
@@ -11,6 +11,25 @@ cases of this pipeline:
 (2) To analyze each omic, run `mopp metag --help` .etc
 
 (3) To run a single analysis step, run `mopp trim --help`.etc
+
+The culmination of the pipelines is the creation of a feature count table using Woltka. 
+
+<h3> <p align = "center"> What do I need to run MOPP? </p> </h3>
+
+Different use cases may have more requirements, but for every use case, the following are necessary:
+1. An input folder with your sequencing data
+2. An output folder
+3. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/test/data/metadata.tsv).
+
+
+***
+<h2> <p align ="center"> Installation </p> </h2>
+
+To install the most up to date version of mopp, run the following command
+
+```
+pip install mopp
+```
 
 ***
 
