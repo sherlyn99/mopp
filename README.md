@@ -21,19 +21,21 @@ cases of this pipeline:
 usage: `mopp workflow -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -x <Index> -t <Num Threads> -z <zebra-filter Path> -c <Cutoff> -ref <Reference Database> -p <Index Prefix>`
 
 example: 
-```mopp workflow  -i ./test/data \
-                  -o ./test/data/out3/ \
-                  -m ./test/data/metadata.tsv \
-                  -x ./test/data/wol_subset_index/wol_subset0.1_index \
-                  -t 4 \
-                  -z /home/y1weng/zebra_filter \
-                  -c 0.1 \
-                  -ref ./test/data/wol_subset_index/wol_above10.concat.fna \
-                  -p myTest \
-                  -r genus,species \
-                  -db /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 \
-                  -strat \
-                  -r genus,species```
+```
+mopp workflow -i ./test/data \
+              -o ./test/data/out3/ \
+              -m ./test/data/metadata.tsv \
+              -x ./test/data/wol_subset_index/wol_subset0.1_index \
+              -t 4 \
+              -z /home/y1weng/zebra_filter \
+              -c 0.1 \
+              -ref ./test/data/wol_subset_index/wol_above10.concat.fna \
+              -p myTest \
+              -r genus,species \
+              -db /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 \
+              -strat \
+              -r genus,species
+```
 
 This is the central tool to MOPP, where you can analyze all omics at the same time.
 With your provided metadata, the tool is able to properly process metagenomic, metatranscriptomic,
@@ -75,11 +77,12 @@ mopp trim -i ./test/data \
 usage: `mopp align -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -p <Pattern> -x <Index> -t <Num Threads>`
 
 example:
-```mopp align -i ./test/data/out2/trimmed \
-   -p *.fq.gz \
-   -o ./test/data/out2/aligned \
-   -x ./test/data/wol_subset_index/wol_subset0.1_index \
-   -t 64
+```
+mopp align -i ./test/data/out2/trimmed \
+           -p *.fq.gz \
+           -o ./test/data/out2/aligned \
+           -x ./test/data/wol_subset_index/wol_subset0.1_index \
+           -t 64
 ```
 
 `mopp align` aligns the sequencing data provided in the input directory to the reference index. Providing a file pattern `-p` allows for specification of files with certain name patterns. Allocating more threads to this command `-t` can reduce processing time.
@@ -91,9 +94,10 @@ example:
 usage: `mopp cov -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -z <zebra-filter Path>`
 
 example: 
-```mopp cov -i ./test/data/out2/aligned/samfiles \
-            -o ./test/data/out2/cov \
-            -z /home/y1weng/zebra_filter
+```
+mopp cov -i ./test/data/out2/aligned/samfiles \
+         -o ./test/data/out2/cov \
+         -z /home/y1weng/zebra_filter
 ```
 
 `mopp cov` uses zebra-filter's calculate_coverages.py to produce a spreadsheet with calculated genome coverages. This is essential for selecting an optimal coverage threshold when generating a subset index.
