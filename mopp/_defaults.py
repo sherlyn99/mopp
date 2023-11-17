@@ -38,6 +38,7 @@ The workflow takes the following steps:
 DESC_MD = "Sample metadata file in tsv format. See README for a template. [required]"
 DESC_INPUT = "Input: Directory of metaG/metaT/metaRS files. [required]"
 DESC_INPUT_SAM = "Input: Directory of metaG/metaT/metaRS samfiles. [required]"
+DESC_INPUT_TRIMMED = "Input: Directory of metaG/metaT/metaRS trimmed files. [required]"
 DESC_OUTPUT = "Output: Directory name to generate or overwite. [required]"
 DESC_INDEX = "Genome index. [required]"
 DESC_NTHREADS = "Number of threads. [default: 4]."
@@ -47,6 +48,13 @@ DESC_PATTERN = "File patterns to include for alignment"
 DESC_RANK = "Taxonomic rank."
 DESC_STRAT = "Enables uniref stratification. Applies to all ranks. Default: off"
 DESC_WOLTKA_DB = "Path to woltka database."
+
+# module: index
+DESC_ZEBRA = "Path to zebra-filter directory."
+DESC_CUTOFF = "The genome coverage cutoff threshold for generating the subset index."
+DESC_REFDB = "Path to the reference database file (.fna, .fna.gz, .fna.xz)."
+DESC_PREFIX = "Prefix for generated files."
+DESC_INPUT_COV = "Path to the coverage file in tab-separated format."
 
 
 # try:

@@ -15,6 +15,12 @@ from mopp._defaults import (
     DESC_STRAT,
     DESC_WOLTKA_DB,
     DESC_PATTERN,
+    DESC_ZEBRA,
+    DESC_CUTOFF,
+    DESC_INPUT_TRIMMED,
+    DESC_PREFIX,
+    DESC_REFDB,
+    DESC_INPUT_COV
 )
 from mopp.modules.trim import trim_files
 from mopp.modules.align import align_files
@@ -39,10 +45,10 @@ def mopp():
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)  # wol bt2 index
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
-@click.option("-z", "--zebra", required=True, help="DESC_ZEBRA")
-@click.option("-c", "--cutoff", type=float, required=True, help="DESC_CUTOFF")
-@click.option("-ref", "--refdb", required=True, help="DESC_REFDB")  # index wol.fna
-@click.option("-p", "--prefix", required=True, help="DESC_PREFIX")  # index prefix
+@click.option("-z", "--zebra", required=True, help=DESC_ZEBRA)
+@click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
+@click.option("-ref", "--refdb", required=True, help=DESC_REFDB)  # index wol.fna
+@click.option("-p", "--prefix", required=True, help=DESC_PREFIX)  # index prefix
 @click.option(
     "-r",
     "--rank",
@@ -133,7 +139,7 @@ def trim(input_dir, output_dir, metadata):
 
 
 @mopp.command()
-@click.option("-i", "--input_dir", required=True, help="DESC_INPUT_TRIMMED")
+@click.option("-i", "--input_dir", required=True, help=DESC_INPUT_TRIMMED)
 @click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
 @click.option("-p", "--pattern", required=True, help=DESC_PATTERN)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)
@@ -156,7 +162,7 @@ def align(input_dir, output_dir, pattern, index, threads):
 @mopp.command()
 @click.option("-i", "--input_dir", required=True, help=DESC_INPUT_SAM)
 @click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
-@click.option("-z", "--zebra", required=True, help="DESC_ZEBRA")
+@click.option("-z", "--zebra", required=True, help=DESC_ZEBRA)
 def cov(input_dir, output_dir, zebra):
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"mopp_{timestamp}.log")
@@ -173,11 +179,11 @@ def cov(input_dir, output_dir, zebra):
 
 
 @mopp.command()
-@click.option("-i", "--input_cov", required=True, help="DESC_INPUT_COV")
-@click.option("-c", "--cutoff", type=float, required=True, help="DESC_CUTOFF")
-@click.option("-ref", "--refdb", required=True, help="DESC_REFDB")
+@click.option("-i", "--input_cov", required=True, help=DESC_INPUT_COV)
+@click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
+@click.option("-ref", "--refdb", required=True, help=DESC_REFDB)
 @click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
-@click.option("-p", "--prefix", required=True, help="DESC_PREFIX")
+@click.option("-p", "--prefix", required=True, help=DESC_PREFIX)
 def generate_index(input_cov, cutoff, refdb, output_dir, prefix):
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"mopp_{timestamp}.log")
