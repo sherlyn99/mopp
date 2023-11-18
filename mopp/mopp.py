@@ -20,7 +20,7 @@ from mopp._defaults import (
     DESC_INPUT_TRIMMED,
     DESC_PREFIX,
     DESC_REFDB,
-    DESC_INPUT_COV
+    DESC_INPUT_COV,
 )
 from mopp.modules.trim import trim_files
 from mopp.modules.align import align_files
@@ -85,7 +85,7 @@ def workflow(
     logger.addHandler(stream_handler)
 
     try:
-        outdir_trimmed = Path(output_dir) / "trimmed"
+        outdir_trimmed = Path(output_dir) / "cat"
         outdir_aligned_metaG = Path(output_dir) / "aligned_metaG"
         outdir_aligned_metaG_samfiles = outdir_aligned_metaG / "samfiles"
         outdir_aligned = Path(output_dir) / "aligned"
