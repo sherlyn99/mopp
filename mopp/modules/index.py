@@ -10,7 +10,9 @@ from mopp.modules.utils import create_folder
 logger = logging.getLogger("mopp")
 
 
-def genome_extraction(cov: str, cutoff: float, refdb: str, outdir: str, prefix: str):
+def genome_extraction(
+    cov: str, cutoff: float, refdb: str, outdir: str, prefix: str, nthreads: int
+):
     """
     Only used for metagenomic data. Takes in a coverages.tsv, a cutoff, an outdir,
     and a prefix. Outputs:
@@ -33,7 +35,7 @@ def genome_extraction(cov: str, cutoff: float, refdb: str, outdir: str, prefix: 
     output_fna_file = _genome_extract(
         gotu_filtered_list, refdb, str(output_bt2index), prefix
     )
-    _build_db(output_fna_file, output_bt2index, prefix)
+    _build_db(output_fna_file, output_bt2index, prefix, nthreads)
 
 
 def _cov_filter(cov: str, cutoff: float):
@@ -132,7 +134,7 @@ def _genome_extract(genome_ids: list, ref_db: str, outdir: str, prefix: str):
     return output_fna_file
 
 
-def _build_db(output_fna_file: str, outdir: str, prefix: str):
+def _build_db(output_fna_file: str, outdir: str, prefix: str, nthreads: int):
     """
     Build a Bowtie2 index from a filtered genome FASTA file.
 
@@ -152,7 +154,9 @@ def _build_db(output_fna_file: str, outdir: str, prefix: str):
     output_bt2index = outdir
     # create_folder(output_bt2index)
 
-    commands = _commands_generation_bt2build(output_fna_file, output_bt2index, prefix)
+    commands = _commands_generation_bt2build(
+        output_fna_file, output_bt2index, prefix, nthreads
+    )
     logger.info(f"{prefix} indexdb creation started")
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
@@ -164,13 +168,15 @@ def _build_db(output_fna_file: str, outdir: str, prefix: str):
 
 
 def _commands_generation_bt2build(
-    output_fna_file: str, output_bt2index: Path, prefix: str
+    output_fna_file: str, output_bt2index: Path, prefix: str, nthreads: int
 ):
     commands = [
         "bowtie2-build",
         output_fna_file,
         f"{output_bt2index}/{prefix}",
         "--large-index",
+        "-p",
+        str(nthreads),
     ]
     return commands
 

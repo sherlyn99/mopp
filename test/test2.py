@@ -115,12 +115,13 @@ class Test(unittest.TestCase):
         INDEX = "./test/data/wol_subset_index/wol_subset0.1_index"
         nthreads = 4
 
-        expected_commands = "bowtie2 -U ./test/data/out2/cat/1-1_t2_metaG_trimmed.fq.gz -x ./test/data/wol_subset_index/wol_subset0.1_index -p 4 --no-unal --no-head -S test/data/out2/aligned/1-1_t2_metaG_trimmed_WoL30.sam 2> test/data/out2/aligned/1-1_t2_metaG_trimmed_WoL30.bow"
+        expected_commands = "bowtie2 -U ./test/data/out2/cat/1-1_t2_metaG_trimmed.fq.gz -x ./test/data/wol_subset_index/wol_subset0.1_index -p 4 --no-unal --no-head -S test/data/out2/aligned/samfiles/1-1_t2_metaG_trimmed_WoL30.sam 2> test/data/out2/aligned/bowfiles/1-1_t2_metaG_trimmed_WoL30.bow"
         actual_commands = " ".join(
             _commands_generation_bowtie2(
                 filepath, identifier, suffix, outdir, INDEX, nthreads
             )
         )
+
         self.assertEqual(expected_commands, actual_commands)
 
     # module: coverages
@@ -170,13 +171,11 @@ class Test(unittest.TestCase):
         output_fna_file = "/path/to/genomes.fna"
         output_bt2index = "/path/to/index"
         prefix = "my_index"
+        threads = 64
 
+        expected_commands = "bowtie2-build /path/to/genomes.fna /path/to/index/my_index --large-index -p 64"
         actual_commands = _commands_generation_bt2build(
-            output_fna_file, output_bt2index, prefix
-        )
-
-        expected_commands = (
-            "bowtie2-build /path/to/genomes.fna /path/to/index/my_index --large-index"
+            output_fna_file, output_bt2index, prefix, threads
         )
 
         # Assertions
@@ -206,8 +205,9 @@ class Test(unittest.TestCase):
             "--outmap",
             "/path/to/outdir/species_level/mapdir",
             "--output",
-            "/path/to/outdir/species_level/counts.tsv",
+            "/path/to/outdir/species_level/counts_species.tsv",
         ]
+
         self.assertEqual(actual_commands, expected_commands)
 
     def test_commands_stratification_generation_woltka(self):
@@ -237,7 +237,7 @@ class Test(unittest.TestCase):
             "--stratify",
             "/path/to/outdir/species_level/mapdir",
             "--output",
-            "/path/to/outdir/species_level/counts_stratified.tsv",
+            "/path/to/outdir/species_level/counts_species_stratified.tsv",
         ]
         self.assertEqual(commands, expected_commands)
 
