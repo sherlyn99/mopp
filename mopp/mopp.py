@@ -101,7 +101,7 @@ def workflow(
             outdir_trimmed, outdir_aligned_metaG, "*metaG*.fq.gz", index, threads
         )
         calculate_genome_coverages(zebra, outdir_aligned_metaG_samfiles, outdir_cov)
-        genome_extraction(outdir_cov_file, cutoff, refdb, outdir_index, prefix)
+        genome_extraction(outdir_cov_file, cutoff, refdb, outdir_index, prefix, threads)
         align_files(
             outdir_trimmed, outdir_aligned, "*.fq.gz", str(outdir_index_path), threads
         )
