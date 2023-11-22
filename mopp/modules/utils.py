@@ -1,6 +1,7 @@
 import shutil
 import subprocess
 
+from multiprocessing import Pool
 
 def create_folder(current_dir):
     if current_dir.exists() and current_dir.is_dir():
@@ -15,6 +16,13 @@ def clear_folder(current_dir):
             item.unlink()
         if item.is_dir():
             shutil.rmtree(item)
+
+def pool_processes(num_processes, function_list):
+    with Pool(processes=num_processes) as pool:
+        for func in function_list:
+            pool.map_async(func[0], func[1])
+        pool.close()
+        pool.join()
 
 
 # import time
