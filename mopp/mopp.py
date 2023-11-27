@@ -27,7 +27,7 @@ from mopp.modules.align import align_files
 from mopp.modules.coverages import calculate_genome_coverages
 from mopp.modules.index import genome_extraction
 from mopp.modules.features import ft_generation
-
+from mopp.modules.utils import check_storage
 
 logger = logging.getLogger("mopp")
 timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
@@ -95,6 +95,19 @@ def workflow(
         outdir_index = Path(output_dir) / "index"
         outdir_index_path = outdir_index / f"{prefix}_bt2index" / prefix
         outdir_features = Path(output_dir) / "features"
+
+
+        ###Storage prediction
+        storage_check = check_storage(input_dir)
+
+        if storage_check != 1:
+            print("WARNING: There may not be enough storage to complete this workflow. We recommend you free up ", storage_check , " of space.")
+            user_input = click.prompt("Would you still like to proceed? (Y/N)", type=str)
+            if user_input.lower() == "n":
+                return
+
+            
+
 
         trim_files(input_dir, outdir_trimmed, metadata, threads)
         align_files(
