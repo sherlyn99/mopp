@@ -1,5 +1,6 @@
 import shutil
-import subprocess
+import os
+from multiprocessing import Pool
 
 
 def create_folder(current_dir):
@@ -15,6 +16,51 @@ def clear_folder(current_dir):
             item.unlink()
         if item.is_dir():
             shutil.rmtree(item)
+
+def pool_processes(num_processes, function_list):
+    with Pool(processes=num_processes) as pool:
+        for func in function_list:
+            pool.map_async(func[0], func[1])
+        pool.close()
+        pool.join()
+
+def get_directory_size(directory_path):
+    total_size = 0
+    try:
+        with os.scandir(directory_path) as entries:
+            for entry in entries:
+                if entry.is_file():
+                    total_size += entry.stat().st_size
+                elif entry.is_dir():
+                    total_size += get_directory_size(entry.path)
+        return total_size
+    except FileNotFoundError:
+        return None
+    
+def convert_size(size_bytes):
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if size_bytes < 1024.0:
+            return f"{size_bytes:.2f} {unit}"
+        size_bytes /= 1024.0
+
+
+def get_available_storage(path="/"):
+    try:
+        total, used, free = shutil.disk_usage(path)
+        return free
+    except FileNotFoundError:
+        return None
+    
+def check_storage(input, multiplier=2):
+    input_size = get_directory_size(input)
+    available_space = get_available_storage()
+
+    ideal_space = input_size * multiplier
+
+    if ideal_space > available_space:
+        return convert_size(-(available_space-ideal_space))
+    else:
+        return 1
 
 
 # import time

@@ -27,7 +27,7 @@ from mopp.modules.align import align_files
 from mopp.modules.coverages import calculate_genome_coverages
 from mopp.modules.index import genome_extraction
 from mopp.modules.features import ft_generation
-
+from mopp.modules.utils import check_storage
 
 logger = logging.getLogger("mopp")
 timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
@@ -96,7 +96,20 @@ def workflow(
         outdir_index_path = outdir_index / f"{prefix}_bt2index" / prefix
         outdir_features = Path(output_dir) / "features"
 
-        trim_files(input_dir, outdir_trimmed, metadata)
+
+        ###Storage prediction
+        storage_check = check_storage(input_dir)
+
+        if storage_check != 1:
+            print("WARNING: There may not be enough storage to complete this workflow. We recommend you free up ", storage_check , " of space.")
+            user_input = click.prompt("Would you still like to proceed? (Y/N)", type=str)
+            if user_input.lower() == "n":
+                return
+
+            
+
+
+        trim_files(input_dir, outdir_trimmed, metadata, threads)
         align_files(
             outdir_trimmed, outdir_aligned_metaG, "*metaG*.fq.gz", index, threads
         )
@@ -123,7 +136,8 @@ def workflow(
 @click.option("-i", "--input_dir", required=True, help=DESC_INPUT)
 @click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
-def trim(input_dir, output_dir, metadata):
+@click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
+def trim(input_dir, output_dir, metadata, threads):
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
@@ -133,7 +147,7 @@ def trim(input_dir, output_dir, metadata):
     logger.addHandler(stream_handler)
 
     try:
-        trim_files(input_dir, output_dir, metadata)
+        trim_files(input_dir, output_dir, metadata, threads)
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 

@@ -2,13 +2,38 @@ import logging
 import subprocess
 from pathlib import Path
 from mopp.modules.utils import create_folder
+from mopp.modules.utils import pool_processes
 from mopp.modules.metadata import load_metadata
+
+
+from multiprocessing import Pool
 
 
 logger = logging.getLogger("mopp")
 
 
-def trim_files(indir, outdir, md_path):
+
+
+def run_trim_metars(args):
+    r1, outdir = args
+    return _run_trim_metars(r1, outdir)
+
+def run_trim_paired(args):
+    r1, r2, outdir = args
+    return _run_trim_paired(r1, r2, outdir)
+
+def rename_files(args):
+    outdir_trimmed, outdir_cat, identifier, omic = args
+    return _rename_files(outdir_trimmed, outdir_cat, identifier, omic)
+    
+def cat_paired(args):
+    outdir_trimmed, outdir_cat, identifier, omic = args
+    print(args)
+    return _cat_paired(outdir_trimmed, outdir_cat, identifier, omic)
+
+
+
+def trim_files(indir, outdir, md_path, threads):
     # load metadata into md_dict
     md_dict = load_metadata(md_path)
 
@@ -19,18 +44,29 @@ def trim_files(indir, outdir, md_path):
     create_folder(outdir_cat)
     create_folder(outdir_trimmed)
 
-    # trim files
+    arg_list_metars = []
+    arg_list_trimpaired = []
+    arg_list_renamefiles = []
+    arg_list_catpaired =[]
+
+
     for identifier, omic_dict in md_dict.items():
         for omic in omic_dict.keys():
             r1_file = Path(indir) / omic_dict[omic][0]
             if omic == "metaRS":
-                _run_trim_metars(r1_file, outdir_trimmed)
-                _rename_files(outdir_trimmed, outdir_cat, identifier, omic)
+                arg_list_metars.append((r1_file, outdir_trimmed))
+                arg_list_renamefiles.append((outdir_trimmed, outdir_cat, identifier, omic))
             else:
                 r2_file = Path(indir) / omic_dict[omic][1]
+                arg_list_trimpaired.append((r1_file, r2_file, outdir_trimmed))
+                arg_list_catpaired.append((outdir_trimmed, outdir_cat, identifier, omic))
 
-                _run_trim_paired(r1_file, r2_file, outdir_trimmed)
-                _cat_paired(outdir_trimmed, outdir_cat, identifier, omic)
+    pool_processes(threads, [[run_trim_metars, arg_list_metars],
+                             [run_trim_paired, arg_list_trimpaired]])
+    
+    pool_processes(threads, [[rename_files, arg_list_renamefiles],
+                             [cat_paired, arg_list_catpaired]])
+
 
 
 def _rename_files(indir, outdir, identifier, omic):
@@ -49,6 +85,7 @@ def _rename_files(indir, outdir, identifier, omic):
 
 
 def _run_trim_paired(r1_file, r2_file, outdir):
+
     commands = [
         "trim_galore",
         "--paired",
