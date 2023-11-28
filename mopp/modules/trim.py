@@ -23,29 +23,32 @@ def trim_files(indir, outdir, md_path):
     for identifier, omic_dict in md_dict.items():
         for omic in omic_dict.keys():
             r1_file = Path(indir) / omic_dict[omic][0]
+            r1_stem = str.split(str(r1_file.name), ".")[0]
+
             if omic == "metaRS":
                 _run_trim_metars(r1_file, outdir_trimmed)
-                _rename_files(outdir_trimmed, outdir_cat, identifier, omic)
+                _rename_files(outdir_trimmed, outdir_cat, identifier, omic, r1_stem)
             else:
                 r2_file = Path(indir) / omic_dict[omic][1]
+                r2_stem = str.split(str(r2_file.name), ".")[0]
 
                 _run_trim_paired(r1_file, r2_file, outdir_trimmed)
-                _cat_paired(outdir_trimmed, outdir_cat, identifier, omic)
+                _cat_paired(outdir_trimmed, outdir_cat, identifier, omic, r2_stem)
 
 
-def _rename_files(indir, outdir, identifier, omic):
+def _rename_files(indir, outdir, identifier, omic, stem):
     commands = [
-        f"mv {indir}/{identifier}*{omic}*trimmed.fq.gz {outdir}/{identifier}_{omic}_trimmed.fq.gz"
+        f"mv {indir}/{stem}*trimmed.fq.gz {outdir}/{identifier}_{omic}_trimmed.fq.gz"
     ]
     p = subprocess.Popen(
         commands, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     output, error = p.communicate()
     if p.returncode != 0:
-        err = f"Renaming {identifier}_{omic} trimmed files failed with code {p.returncode} and error {error}"
+        err = f"Renaming {stem} trimmed files failed with code {p.returncode} and error {error}"
         logger.error(err)
     else:
-        logger.info(f"Renaming {identifier}_{omic} trimmed files finished")
+        logger.info(f"Renaming {stem} trimmed files finished")
 
 
 def _run_trim_paired(r1_file, r2_file, outdir):
@@ -93,19 +96,19 @@ def _run_trim_metars(r1_file, outdir):
         logger.info(f"{r1_file.name} trimming finished")
 
 
-def _cat_paired(indir, outdir, identifier, omic):
+def _cat_paired(indir, outdir, identifier, omic, stem):
     commands = [
-        f"cat {indir}/{identifier}*{omic}*.fq.gz > {outdir}/{identifier}_{omic}_trimmed.fq.gz"
+        f"cat {indir}/{stem}*.fq.gz > {outdir}/{identifier}_{omic}_trimmed.fq.gz"
     ]
     p = subprocess.Popen(
         commands, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     output, error = p.communicate()
     if p.returncode != 0:
-        err = f"Concatenation of {identifier}_{omic} trimmed files failed with code {p.returncode} and error {error}"
+        err = f"Concatenation of {stem} trimmed files failed with code {p.returncode} and error {error}"
         logger.error(err)
     else:
-        logger.info(f"Concatenation of {identifier}_{omic} trimmed files finished")
+        logger.info(f"Concatenation of {stem} trimmed files finished")
     return
 
 
