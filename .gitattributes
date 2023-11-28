@@ -1,1 +1,3 @@
+*.html linguist-detectable=false
+*.py linguist-detectable=true
 static/* linguist-vendored
