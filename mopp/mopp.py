@@ -96,7 +96,7 @@ def workflow(
         outdir_index_path = outdir_index / f"{prefix}_bt2index" / prefix
         outdir_features = Path(output_dir) / "features"
 
-        trim_files(input_dir, outdir_trimmed, metadata)
+        trim_files(input_dir, outdir_trimmed, metadata, threads)
         align_files(
             outdir_trimmed, outdir_aligned_metaG, "*metaG*.fq.gz", index, threads
         )
@@ -123,7 +123,8 @@ def workflow(
 @click.option("-i", "--input_dir", required=True, help=DESC_INPUT)
 @click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
-def trim(input_dir, output_dir, metadata):
+@click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
+def trim(input_dir, output_dir, metadata, threads):
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
@@ -133,7 +134,7 @@ def trim(input_dir, output_dir, metadata):
     logger.addHandler(stream_handler)
 
     try:
-        trim_files(input_dir, output_dir, metadata)
+        trim_files(input_dir, output_dir, metadata, threads)
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
