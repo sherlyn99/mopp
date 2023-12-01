@@ -30,6 +30,7 @@ To install the most up to date version of mopp, run the following command
 ```
 pip install mopp
 ```
+or
 ```
 git clone https://github.com/sherlyn99/mopp.git
 cd projectdir
