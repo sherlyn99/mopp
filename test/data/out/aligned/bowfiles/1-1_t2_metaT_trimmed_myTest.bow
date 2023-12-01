@@ -1,0 +1,3 @@
+Could not locate a Bowtie index corresponding to basename "test/data/out/index/myTest_bt2index/myTest"
+Error: Encountered internal Bowtie 2 exception (#1)
+Command: /home/y1weng/mambaforge/envs/mopp/bin/bowtie2-align-s --wrapper basic-0 -x test/data/out/index/myTest_bt2index/myTest -p 4 --no-head --passthrough -U /tmp/62197.unp 

@@ -77,7 +77,7 @@ def workflow(
     stratification,
 ):
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -126,7 +126,7 @@ def workflow(
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
 def trim(input_dir, output_dir, metadata, threads):
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -147,7 +147,7 @@ def trim(input_dir, output_dir, metadata, threads):
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
 def align(input_dir, output_dir, pattern, index, threads):
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -166,7 +166,7 @@ def align(input_dir, output_dir, pattern, index, threads):
 @click.option("-z", "--zebra", required=True, help=DESC_ZEBRA)
 def cov(input_dir, output_dir, zebra):
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -187,7 +187,7 @@ def cov(input_dir, output_dir, zebra):
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)
 def generate_index(input_cov, cutoff, refdb, output_dir, prefix):
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -216,7 +216,7 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix):
 )
 def feature_table(rank, input_dir, output_dir, woltka_database, stratification):
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
