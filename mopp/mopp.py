@@ -27,6 +27,7 @@ from mopp.modules.align import align_files
 from mopp.modules.coverages import calculate_genome_coverages
 from mopp.modules.index import genome_extraction
 from mopp.modules.features import ft_generation
+from mopp.modules.utils import create_folder_without_clear
 
 
 logger = logging.getLogger("mopp")
@@ -76,6 +77,8 @@ def workflow(
     woltka_database,
     stratification,
 ):
+    create_folder_without_clear(Path(output_dir))
+
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
@@ -125,6 +128,8 @@ def workflow(
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
 def trim(input_dir, output_dir, metadata, threads):
+    create_folder_without_clear(Path(output_dir))
+
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
@@ -146,6 +151,8 @@ def trim(input_dir, output_dir, metadata, threads):
 @click.option("-x", "--index", required=True, help=DESC_INDEX)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
 def align(input_dir, output_dir, pattern, index, threads):
+    create_folder_without_clear(Path(output_dir))
+
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
@@ -165,6 +172,8 @@ def align(input_dir, output_dir, pattern, index, threads):
 @click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
 @click.option("-z", "--zebra", required=True, help=DESC_ZEBRA)
 def cov(input_dir, output_dir, zebra):
+    create_folder_without_clear(Path(output_dir))
+
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
@@ -186,6 +195,8 @@ def cov(input_dir, output_dir, zebra):
 @click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)
 def generate_index(input_cov, cutoff, refdb, output_dir, prefix):
+    create_folder_without_clear(Path(output_dir))
+
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)
@@ -215,6 +226,8 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix):
     "-strat", "--stratification", is_flag=True, default=False, help=DESC_STRAT
 )
 def feature_table(rank, input_dir, output_dir, woltka_database, stratification):
+    create_folder_without_clear(Path(output_dir))
+
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
     filer_handler.setFormatter(formatter)

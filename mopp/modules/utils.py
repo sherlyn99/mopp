@@ -1,7 +1,13 @@
 import shutil
-import subprocess
-
 from multiprocessing import Pool
+
+
+def create_folder_without_clear(current_dir):
+    if current_dir.exists() and current_dir.is_dir():
+        return
+    else:
+        current_dir.mkdir(parents=True, exist_ok=True)
+
 
 def create_folder(current_dir):
     if current_dir.exists() and current_dir.is_dir():
@@ -16,6 +22,7 @@ def clear_folder(current_dir):
             item.unlink()
         if item.is_dir():
             shutil.rmtree(item)
+
 
 def pool_processes(num_processes, function_list):
     with Pool(processes=num_processes) as pool:
