@@ -4,10 +4,7 @@ from pathlib import Path
 from mopp.modules.utils import create_folder
 from mopp.modules.utils import pool_processes
 from mopp.modules.metadata import load_metadata
-
-
 from multiprocessing import Pool
-
 
 logger = logging.getLogger("mopp")
 
@@ -71,7 +68,6 @@ def trim_files(indir, outdir, md_path, threads):
         threads,
         [[run_trim_metars, arg_list_metars], [run_trim_paired, arg_list_trimpaired]],
     )
-
     pool_processes(
         threads,
         [[rename_files, arg_list_renamefiles], [cat_paired, arg_list_catpaired]],
