@@ -38,6 +38,13 @@ pip install -e .
 ```
 
 ***
+<h2> <p align ="center"> Dependencies </p> </h2>
+
+The Web of Life Database is used by MOPP as a reference for microbe phylogenies. This database is not included in the distribution and must be downloaded independently [here](https://biocore.github.io/wol/download).
+
+MOPP uses `zebra-filter` for calculating genome coverages and filtering genomes based on coverage thresholds. This library is not included in the distribution and must be downloaded independently [here](https://github.com/biocore/zebra_filter).
+
+***
 
 <h2> <p align ="center"> Documentation </p> </h2>
 
