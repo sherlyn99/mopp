@@ -190,6 +190,6 @@ mopp feature-table -i ./test/data/out2/aligned/samfiles \
 
 `mopp feature_table` is the culmination of the processing pipeline. Given the processed sequencing files, the command produces a feature count table using the Woltka database. Stratification options include `species`, `genus`, and `genus,species`
 
-
-
+***
 <h2> <p align ="center"> FAQs </p> </h2>
+coming soon
