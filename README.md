@@ -18,24 +18,30 @@ The culmination of the pipelines is the creation of a feature count table using 
 
 Different use cases may have more requirements, but for every use case, the following are necessary:
 1. An input folder with your sequencing data
-2. An output folder
-3. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/test/data/metadata.tsv). Please avoid . in naming files unless . is used before suffix.
+2. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/test/data/metadata.tsv). Please avoid . in naming files unless . is used before suffix.
 
 
 ***
 <h2> <p align ="center"> Installation </p> </h2>
 
 To install the most up to date version of mopp, run the following command
-
+```
+git clone https://github.com/sherlyn99/mopp.git
+cd mopp
+conda env create -f environmental.yml
+pip install -e .
+```
+or 
 ```
 pip install mopp
 ```
-or
-```
-git clone https://github.com/sherlyn99/mopp.git
-cd projectdir
-pip install -e .
-```
+
+***
+<h2> <p align ="center"> Dependencies </p> </h2>
+
+The Web of Life Database is used by MOPP as a reference for microbe phylogenies. This database is not included in the distribution and must be downloaded independently [here](https://biocore.github.io/wol/download).
+
+MOPP uses `zebra-filter` for calculating genome coverages and filtering genomes based on coverage thresholds. This library is not included in the distribution and must be downloaded independently [here](https://github.com/biocore/zebra_filter).
 
 ***
 
