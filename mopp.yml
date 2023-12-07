@@ -74,4 +74,3 @@ dependencies:
       - typing-extensions==4.8.0
       - tzdata==2023.3
       - woltka==0.1.5
-prefix: /home/y1weng/mambaforge/envs/mopp
