@@ -33,7 +33,7 @@ pip install mopp
 or
 ```
 git clone https://github.com/sherlyn99/mopp.git
-cd projectdir
+cd mopp
 pip install -e .
 ```
 
