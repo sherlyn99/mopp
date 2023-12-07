@@ -52,6 +52,10 @@ wget --no-check-certificate -nH -np -r --cut-dirs=1  https://ftp.microbio.me/pub
 ```
 
 MOPP uses `zebra-filter` for calculating genome coverages and filtering genomes based on coverage thresholds. This library is not included in the distribution and must be downloaded independently [here](https://github.com/biocore/zebra_filter).
+```
+# make sure your are in mopp/mopp_db
+git clone https://github.com/biocore/zebra_filter.git
+```
 
 ***
 
