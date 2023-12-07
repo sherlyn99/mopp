@@ -26,15 +26,15 @@ Different use cases may have more requirements, but for every use case, the foll
 <h2> <p align ="center"> Installation </p> </h2>
 
 To install the most up to date version of mopp, run the following command
-
-```
-pip install mopp
-```
-or
 ```
 git clone https://github.com/sherlyn99/mopp.git
 cd mopp
+conda env create -f environmental.yml
 pip install -e .
+```
+or 
+```
+pip install mopp
 ```
 
 ***
