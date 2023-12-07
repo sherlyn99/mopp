@@ -31,9 +31,13 @@ cd mopp
 conda env create -f mopp.yml
 pip install -e .
 ```
-or 
+or use mamba for faster installation
 ```
-pip install mopp
+git clone https://github.com/sherlyn99/mopp.git
+cd mopp
+conda install mamba -n base -c conda-forge
+mamba env create -f mopp.yml
+pip install -e .
 ```
 
 ***
