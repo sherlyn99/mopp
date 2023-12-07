@@ -28,7 +28,7 @@ To install the most up to date version of mopp, run the following command
 ```
 git clone https://github.com/sherlyn99/mopp.git
 cd mopp
-conda env create -f environmental.yml
+conda env create -f mopp.yml
 pip install -e .
 ```
 or 
