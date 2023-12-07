@@ -18,8 +18,7 @@ The culmination of the pipelines is the creation of a feature count table using 
 
 Different use cases may have more requirements, but for every use case, the following are necessary:
 1. An input folder with your sequencing data
-2. An output folder
-3. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/test/data/metadata.tsv). Please avoid . in naming files unless . is used before suffix.
+2. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/test/data/metadata.tsv). Please avoid . in naming files unless . is used before suffix.
 
 
 ***
