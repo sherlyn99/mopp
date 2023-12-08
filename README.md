@@ -56,7 +56,7 @@ Create bowtie2 index of the WoL database by running the followig commands.
 cd wol-20April2021
 mkdir -p databases/bowtie2
 xzcat genomes/concat.fna.xz > /tmp/input.fna
-bowtie2-build --seed 42 --threads 16 /tmp/input.fna databases/bowtie2/WoLr1
+bowtie2-build --seed 42 /tmp/input.fna databases/bowtie2/WoLr1
 rm /tmp/input.fna
 ```
 
