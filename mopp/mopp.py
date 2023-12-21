@@ -1,6 +1,7 @@
 import time
 import click
 import logging
+import concurrent.futures
 from pathlib import Path
 from mopp._defaults import (
     MSG_WELCOME,
@@ -21,6 +22,7 @@ from mopp._defaults import (
     DESC_PREFIX,
     DESC_REFDB,
     DESC_INPUT_COV,
+    DESC_EMAIL
 )
 from mopp.modules.trim import trim_files
 from mopp.modules.align import align_files
@@ -28,11 +30,15 @@ from mopp.modules.coverages import calculate_genome_coverages
 from mopp.modules.index import genome_extraction
 from mopp.modules.features import ft_generation
 from mopp.modules.utils import create_folder_without_clear
+from mopp.modules.server import request_cutoff
 
 
 logger = logging.getLogger("mopp")
 timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+
+def get_user_input():
+    return click.prompt("Please enter your desired coverage threshold here")
 
 
 @click.group(help=MSG_WELCOME)
@@ -47,7 +53,8 @@ def mopp():
 @click.option("-x", "--index", required=True, help=DESC_INDEX)  # wol bt2 index
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
 @click.option("-z", "--zebra", required=True, help=DESC_ZEBRA)
-@click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
+@click.option("-c", "--cutoff", type=float, help=DESC_CUTOFF)
+@click.option("-e", "--email", help=DESC_EMAIL)
 @click.option("-ref", "--refdb", required=True, help=DESC_REFDB)  # index wol.fna
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)  # index prefix
 @click.option(
@@ -71,6 +78,7 @@ def workflow(
     threads,
     zebra,
     cutoff,
+    email,
     refdb,
     prefix,
     rank,
@@ -104,7 +112,52 @@ def workflow(
             outdir_trimmed, outdir_aligned_metaG, "*metaG*.fq.gz", index, threads
         )
         calculate_genome_coverages(zebra, outdir_aligned_metaG_samfiles, outdir_cov)
-        genome_extraction(outdir_cov_file, cutoff, refdb, outdir_index, prefix, threads)
+
+        if (cutoff == None):
+            if (email == None):
+                cutoff = get_user_input()
+            else:
+                cutoff = request_cutoff(email, outdir_cov)
+                '''while True:
+                    OK_VALUE = False
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                    # Submit both functions for concurrent execution
+                        future1 = executor.submit(get_user_input)
+                        future2 = executor.submit(request_cutoff, email, outdir_cov) 
+
+                        completed, not_done = concurrent.futures.wait([future1, future2], return_when=concurrent.futures.FIRST_COMPLETED)
+
+                        for future in completed:
+                            if future == future1:
+                                print("FIRST")
+                                cutoff = future1.result()
+                                try:
+                                    float_value = float(cutoff)
+                                    if 0 <= float_value <= 1:
+                                        OK_VALUE = True
+                                        executor.shutdown()
+                                except ValueError:
+                                    OK_VALUE = False
+                                    logger.error("Coverage cutoff is not a float or not betwseen 0 and 1. Please re-enter.")
+                            elif future == future2:
+                                print("SECOND", future2.result())
+                                cutoff = future2.result()
+                                OK_VALUE = True
+                                executor.shutdown()
+                                # Sanity check is performed server-side.
+                            
+                        if OK_VALUE:    
+                            for future in not_done:
+                                print("CANCELLING")
+                                future.cancel()
+         '''           
+
+        
+        print("THE CUTOFF WAS RETRIEVED. IT IS: ", cutoff)
+
+
+
+        genome_extraction(outdir_cov_file, float(cutoff), refdb, outdir_index, prefix, threads)
         align_files(
             outdir_trimmed, outdir_aligned, "*.fq.gz", str(outdir_index_path), threads
         )
