@@ -42,6 +42,7 @@ DESC_INPUT_TRIMMED = "Input: Directory of metaG/metaT/metaRS trimmed files. [req
 DESC_OUTPUT = "Output: Directory name to generate or overwite. [required]"
 DESC_INDEX = "Genome index. [required]"
 DESC_NTHREADS = "Number of threads. [default: 4]."
+DESC_EMAIL = "Email to send calculated coverages to. Will receieve threshold from this address."
 # module: align
 DESC_PATTERN = "File patterns to include for alignment"
 # module: features
