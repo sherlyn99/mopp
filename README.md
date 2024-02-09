@@ -29,6 +29,7 @@ To install the most up to date version of mopp, run the following command
 git clone https://github.com/sherlyn99/mopp.git
 cd mopp
 conda env create -f mopp.yml
+conda activate mopp
 pip install -e .
 ```
 or use mamba for faster installation
@@ -37,6 +38,7 @@ git clone https://github.com/sherlyn99/mopp.git
 cd mopp
 conda install mamba -n base -c conda-forge
 mamba env create -f mopp.yml
+mamba activate mopp
 pip install -e .
 ```
 
