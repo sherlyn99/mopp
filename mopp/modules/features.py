@@ -65,29 +65,71 @@ def ft_generation(indir, outdir, db, rank: list, stratification):
                 )
             else:
                 logger.info(f"{message} finished")
+
+    if "default" in rank:
+        # default mode gives feature ID as 'G0000XXX'
+        # default mode does not support stratification yet
+        message = "default level feature table generation"
+        commands = _commands_generation_woltka("default", indir, outdir, db)
+        logger.info(f"{message} started")
+        p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output, error = p.communicate()
+        if p.returncode != 0:
+            logger.error(
+                f"{message} failed with code {p.returncode} and error {error.decode('utf=8')}"
+            )
+        else:
+            logger.info(f"{message} finished")
+
+        # if stratification:
+        #     message = "species-uniref stratified feature table generation"
+        #     commands = _commands_stratification_generation_woltka(
+        #         "species", indir, outdir, db
+        #     )
+        #     logger.info(f"{message} started")
+        #     p = subprocess.Popen(
+        #         commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        #     )
+        #     output, error = p.communicate()
+        #     if p.returncode != 0:
+        #         logger.error(
+        #             f"{message} failed with code {p.returncode} and error {error}"
+        #         )
+        #     else:
+        #         logger.info(f"{message} finished")
     return
 
 
 def _commands_generation_woltka(rank: str, indir, outdir, db):
-    commands = [
-        "woltka",
-        "classify",
-        "--input",
-        indir,
-        "--map",
-        f"{db}/taxonomy/taxid.map",
-        "--nodes",
-        f"{db}/taxonomy/nodes.dmp",
-        "--names",
-        f"{db}/taxonomy/names.dmp",
-        "--rank",
-        rank,
-        "--name-as-id",
-        "--outmap",
-        f"{outdir}/{rank}_level/mapdir",
-        "--output",
-        f"{outdir}/{rank}_level/counts_{rank}.tsv",
-    ]
+    if rank == "default":
+        commands = [
+            "woltka",
+            "classify",
+            "--input",
+            str(indir),
+            "--output",
+            f"{outdir}/counts_{rank}.tsv",  # woltka classify errors out if -o old_dir/new_dir/new_file
+        ]
+    else:
+        commands = [
+            "woltka",
+            "classify",
+            "--input",
+            indir,
+            "--map",
+            f"{db}/taxonomy/taxid.map",
+            "--nodes",
+            f"{db}/taxonomy/nodes.dmp",
+            "--names",
+            f"{db}/taxonomy/names.dmp",
+            "--rank",
+            rank,
+            "--name-as-id",
+            "--outmap",
+            f"{outdir}/{rank}_level/mapdir",
+            "--output",
+            f"{outdir}/{rank}_level/counts_{rank}.tsv",
+        ]
     return commands
 
 

@@ -33,6 +33,23 @@ The workflow takes the following steps:
 [Insert paper citation here]
 
 """
+# add in subset index later, currently not required by Maxwell
+MSG_WELCOME_METAG = """
+This is the MOPP workflow for processing metagenoimcs reads only. This workflow can 
+trim, align metagenoimcs reads to produce count tables that classify by genus 
+and stratify species by uniref annotation. 
+
+The workflow takes the following steps:
+
+1) Trim adapters off of all sequencing files.
+
+2) Align metagenomic files to the Web of Life Database and 
+   calculate genome coverages. 
+   
+3) Generate genus classification and Species|Uniref stratification count tables 
+using Woltka.
+
+"""
 
 # descriptions
 DESC_MD = "Sample metadata file in tsv format. See README for a template. [required]"
@@ -42,8 +59,10 @@ DESC_INPUT_TRIMMED = "Input: Directory of metaG/metaT/metaRS trimmed files. [req
 DESC_OUTPUT = "Output: Directory name to generate or overwite. [required]"
 DESC_INDEX = "Genome index. [required]"
 DESC_NTHREADS = "Number of threads. [default: 4]."
+
 # module: align
 DESC_PATTERN = "File patterns to include for alignment"
+
 # module: features
 DESC_RANK = "Taxonomic rank."
 DESC_STRAT = "Enables uniref stratification. Applies to all ranks. Default: off"
