@@ -195,7 +195,7 @@ def cov(input_dir, output_dir, zebra):
 @click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
-def generate_index(input_cov, cutoff, refdb, output_dir, prefix):
+def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
