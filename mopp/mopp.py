@@ -194,6 +194,7 @@ def cov(input_dir, output_dir, zebra):
 @click.option("-ref", "--refdb", required=True, help=DESC_REFDB)
 @click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)
+@click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
 def generate_index(input_cov, cutoff, refdb, output_dir, prefix):
     create_folder_without_clear(Path(output_dir))
 
@@ -206,7 +207,8 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix):
     logger.addHandler(stream_handler)
 
     try:
-        genome_extraction(input_cov, cutoff, refdb, output_dir, prefix)
+        genome_extraction(input_cov, cutoff, refdb, output_dir, prefix, threads)
+        
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
