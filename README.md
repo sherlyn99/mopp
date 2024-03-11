@@ -162,24 +162,24 @@ mopp cov -i ./test/data/out2/aligned/samfiles \
 
 <h4> <p align ="center"> mopp generate_index </p> </h4>
 
-usage: `mopp generate_index -i <Input Coverage> -o <Output Directory> -c <Cutoff> -ref <Reference Database> -p <Prefix>`
+usage: `mopp generate-index -i <Input Coverage> -o <Output Directory> -c <Cutoff> -ref <Reference Database> -p <Prefix>`
 
 example: 
 ```
-mopp align -i ./test/data/coverages.txt \
+mopp generate-index -i ./test/data/coverages.txt \
            -o ./test/data/out2/ \
            -c 0.2 \
            -x /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 \
            -p 0.2_cutoff_index
 ```
 
-`mopp generate_index` creates a subset index from a larger database, given a cutoff threshold. For example, `-c 0.2` would generate a subset that only contains genomes with 20% or greater coverage.
+`mopp generate-index` creates a subset index from a larger database, given a cutoff threshold. For example, `-c 0.2` would generate a subset that only contains genomes with 20% or greater coverage.
 
 <h2> <p align ="center"> </p> </h2>
 
 <h4> <p align ="center"> mopp feature_table </p> </h4>
 
-usage: `mopp feature_table -i <Input Directory> -o <Output Directory> -db <Woltka Database> -strat <Stratification>`
+usage: `mopp feature-table -i <Input Directory> -o <Output Directory> -db <Woltka Database> -strat <Stratification>`
 
 example: 
 ```
