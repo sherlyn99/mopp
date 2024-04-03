@@ -56,6 +56,7 @@ def _md_to_dict(md_df):
         )
         if identifier not in md_dict:
             md_dict[identifier] = {"metaG": [-1, -1], "metaT": [-1, -1], "metaRS": [-1]}
+            # md_dict[identifier] = {"metaRS": [-1]}
         if strand == "r1":
             md_dict[identifier][omic][0] = sample_name
         elif strand == "r2":

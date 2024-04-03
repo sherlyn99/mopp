@@ -26,7 +26,6 @@ def rename_files(args):
 
 def cat_paired(args):
     outdir_trimmed, outdir_cat, identifier, omic, stem = args
-    print(args)
     return _cat_paired(outdir_trimmed, outdir_cat, identifier, omic, stem)
 
 

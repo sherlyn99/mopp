@@ -119,8 +119,8 @@ usage: `mopp trim -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)>
 example: 
 ```
 mopp trim -i ./test/data \
-          -o ./test/data/out2/trimmed \
-          -m ./test/data/metadata.tsv
+   -o ./test/data/out3/cat \
+   -m ./test/data/metadata.tsv
 ```
 
 `mopp trim` trims sequencing data provided in the input directory. The metadata indicates which type of data it is (metaG, metaT, or metaRS) so that optimal trimming parameters can be selected case-by-case. 
@@ -134,11 +134,11 @@ usage: `mopp align -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)
 
 example:
 ```
-mopp align -i ./test/data/out2/trimmed \
-           -p *.fq.gz \
-           -o ./test/data/out2/aligned \
-           -x ./test/data/wol_subset_index/wol_subset0.1_index \
-           -t 64
+mopp align -i ./test/data/out3/cat \
+   -p *.fq.gz \
+   -o ./test/data/out3/aligned \
+   -x ./test/data/wol_subset_index/wol_subset0.1_index \
+   -t 4
 ```
 
 `mopp align` aligns the sequencing data provided in the input directory to the reference index. Providing a file pattern `-p` allows for specification of files with certain name patterns. Allocating more threads to this command `-t` can reduce processing time.
@@ -151,9 +151,9 @@ usage: `mopp cov -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> 
 
 example: 
 ```
-mopp cov -i ./test/data/out2/aligned/samfiles \
-         -o ./test/data/out2/cov \
-         -z /home/y1weng/zebra_filter
+mopp cov -i ./test/data/out3/aligned/samfiles \
+   -o ./test/data/out3/cov \
+   -z /home/y1weng/zebra_filter
 ```
 
 `mopp cov` uses zebra-filter's calculate_coverages.py to produce a spreadsheet with calculated genome coverages. This is essential for selecting an optimal coverage threshold when generating a subset index.
@@ -166,11 +166,11 @@ usage: `mopp generate-index -i <Input Coverage> -o <Output Directory> -c <Cutoff
 
 example: 
 ```
-mopp generate-index -i ./test/data/coverages.txt \
-           -o ./test/data/out2/ \
-           -c 0.2 \
-           -x /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 \
-           -p 0.2_cutoff_index
+mopp generate-index -i ./test/data/out2/cov/coverages.tsv \
+   -c 0.1 \
+   -ref ./test/data/wol_subset_index/wol_above10.concat.fna \
+   -o ./test/data/out3/index \
+   -p myTest
 ```
 
 `mopp generate-index` creates a subset index from a larger database, given a cutoff threshold. For example, `-c 0.2` would generate a subset that only contains genomes with 20% or greater coverage.
@@ -183,11 +183,11 @@ usage: `mopp feature-table -i <Input Directory> -o <Output Directory> -db <Woltk
 
 example: 
 ```
-mopp feature-table -i ./test/data/out2/aligned/samfiles \
-                   -o ./test/data/out2/features \
-                   -db /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 \
-                   -strat \
-                   -r genus,species
+mopp feature-table -i ./test/data/out3/aligned/samfiles \
+   -o ./test/data/out2/features \
+   -db /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 \
+   -strat \
+   -r genus,species
 ```
 
 `mopp feature_table` is the culmination of the processing pipeline. Given the processed sequencing files, the command produces a feature count table using the Woltka database. Stratification options include `species`, `genus`, and `genus,species`
