@@ -25,10 +25,10 @@ The workflow takes the following steps:
 2) Align metagenomic files to the entire Web of Life Database and 
    calculate genome coverages. A subset index of the Web of Life Database
    is created based on a desired genome coverage threshold.
-   
-4) Align metagenomic, metatranscriptomic, and metatranslatomic data to the subset index.
-   
-5) Generate genus classification and Species|Uniref stratification count tables using Woltka.
+
+3) Align metagenomic, metatranscriptomic, and metatranslatomic data to the subset index.
+
+4) Generate genus classification and Species|Uniref stratification count tables using Woltka.
 
 [Insert paper citation here]
 

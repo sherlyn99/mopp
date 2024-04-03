@@ -208,7 +208,7 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
 
     try:
         genome_extraction(input_cov, cutoff, refdb, output_dir, prefix, threads)
-        
+
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
