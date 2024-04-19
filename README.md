@@ -24,6 +24,11 @@ Different use cases may have more requirements, but for every use case, the foll
 ***
 <h2> <p align ="center"> Installation </p> </h2>
 
+To install mopp using pip, run the following command
+```
+pip3 install mopp
+```
+
 To install the most up to date version of mopp, run the following command
 ```
 git clone https://github.com/sherlyn99/mopp.git
