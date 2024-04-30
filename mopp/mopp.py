@@ -1,4 +1,4 @@
-import time
+import sys
 import click
 import logging
 from pathlib import Path
@@ -24,15 +24,13 @@ from mopp._defaults import (
 )
 from mopp.modules.trim import trim_files
 from mopp.modules.align import align_files
-from mopp.modules.coverages import calculate_genome_coverages
+from mopp.modules.coverages import calculate_coverages
 from mopp.modules.index import genome_extraction
 from mopp.modules.features import ft_generation
-from mopp.modules.utils import create_folder_without_clear
+from mopp.modules.utils import create_folder_without_clear, logger_setup
 
 
-logger = logging.getLogger("mopp")
-timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+my_logger = logging.getLogger("mopp")
 
 
 @click.group(help=MSG_WELCOME)
@@ -41,8 +39,8 @@ def mopp():
 
 
 @mopp.command(help=MSG_WELCOME_WORKFLOW)
-@click.option("-i", "--input_dir", required=True, help=DESC_INPUT)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)  # wol bt2 index
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
@@ -123,8 +121,8 @@ def workflow(
 
 
 @mopp.command()
-@click.option("-i", "--input_dir", required=True, help=DESC_INPUT)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
 def trim(input_dir, output_dir, metadata, threads):
@@ -145,8 +143,8 @@ def trim(input_dir, output_dir, metadata, threads):
 
 
 @mopp.command()
-@click.option("-i", "--input_dir", required=True, help=DESC_INPUT_TRIMMED)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT_TRIMMED)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option("-p", "--pattern", required=True, help=DESC_PATTERN)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
@@ -168,31 +166,33 @@ def align(input_dir, output_dir, pattern, index, threads):
 
 
 @mopp.command()
-@click.option("-i", "--input_dir", required=True, help=DESC_INPUT_SAM)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
-@click.option("-z", "--zebra", required=True, help=DESC_ZEBRA)
-def cov(input_dir, output_dir, zebra):
-    create_folder_without_clear(Path(output_dir))
+# fmt: off
+@click.option("-i", "--input-dir", type=click.Path(exists=True), required=True, help=DESC_INPUT_SAM,)
+@click.option("-o", "--output-dir", type=click.Path(exists=False), required=True, help=DESC_OUTPUT)
+@click.option("-g", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_ZEBRA)
+# fmt: on
+def cov(input_dir, output_dir, genome_lengths):
+    if Path(output_dir).exists():
+        click.echo("Output directory already exists!")
+        sys.exit(1)
 
-    logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
+    create_folder_without_clear(output_dir)
+    logger = logger_setup(my_logger, output_dir)
 
+    logger.info("Calculation of genome covarges started.")
     try:
-        calculate_genome_coverages(zebra, input_dir, output_dir)
+        calculate_coverages(input_dir, output_dir, genome_lengths)
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
+    else:
+        logger.info("Calculation of genome covarges finished.")
 
 
 @mopp.command()
-@click.option("-i", "--input_cov", required=True, help=DESC_INPUT_COV)
+@click.option("-i", "--input-cov", required=True, help=DESC_INPUT_COV)
 @click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
 @click.option("-ref", "--refdb", required=True, help=DESC_REFDB)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
 def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
@@ -214,8 +214,8 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
 
 
 @mopp.command()
-@click.option("-i", "--input_dir", required=True, help=DESC_INPUT_SAM)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT_SAM)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option(
     "-r",
     "--rank",

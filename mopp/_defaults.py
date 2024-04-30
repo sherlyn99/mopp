@@ -37,10 +37,12 @@ The workflow takes the following steps:
 # descriptions
 DESC_MD = "Sample metadata file in tsv format. See README for a template. [required]"
 DESC_INPUT = "Input: Directory of metaG/metaT/metaRS files. [required]"
-DESC_INPUT_SAM = "Input: Directory of metaG/metaT/metaRS samfiles. [required]"
-DESC_INPUT_TRIMMED = "Input: Directory of metaG/metaT/metaRS trimmed files. [required]"
-DESC_OUTPUT = "Output: Directory name to generate or overwite. [required]"
-DESC_INDEX = "Genome index. [required]"
+DESC_INPUT_SAM = "Input: Directory of metaG/metaT/metaRS samfiles."
+DESC_INPUT_TRIMMED = "Input: Directory of metaG/metaT/metaRS trimmed files."
+DESC_OUTPUT = (
+    "Output: Output directory. Must be a new directory that currenty does not exist."
+)
+DESC_INDEX = "Genome index."
 DESC_NTHREADS = "Number of threads. [default: 4]."
 # module: align
 DESC_PATTERN = "File patterns to include for alignment"
