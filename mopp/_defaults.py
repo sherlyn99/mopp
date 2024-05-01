@@ -52,7 +52,7 @@ DESC_STRAT = "Enables uniref stratification. Applies to all ranks. Default: off"
 DESC_WOLTKA_DB = "Path to woltka database."
 
 # module: index
-DESC_ZEBRA = "Path to zebra-filter directory."
+DESC_GENOME_LENGTHS = "Path to a file with geome lengths."
 DESC_CUTOFF = "The genome coverage cutoff threshold for generating the subset index."
 DESC_REFDB = "Path to the reference database file (.fna, .fna.gz, .fna.xz)."
 DESC_PREFIX = "Prefix for generated files."

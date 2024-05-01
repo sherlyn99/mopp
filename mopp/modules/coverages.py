@@ -1,12 +1,13 @@
 import logging
-from pathlib import Path
 from micov._modules import cli_compress
+from mopp.modules.utils import create_folder_without_clear
 
 
 logger = logging.getLogger("mopp")
 
 
 def calculate_coverages(input_dir, output_dir, genome_lengths):
+    create_folder_without_clear(output_dir)
 
     cli_compress(
         input_dir,

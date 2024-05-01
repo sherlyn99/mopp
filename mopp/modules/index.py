@@ -52,9 +52,9 @@ def _cov_filter(cov: str, cutoff: float):
     - gotu_filtered (pd.Series): Filtered genome IDs.
     """
     cov = pd.read_csv(cov, sep="\t")
-    cov_filtered = cov.loc[cov["coverage_ratio"] >= cutoff]
-    cov_filtered = cov_filtered.sort_values(by="coverage_ratio", ascending=False)
-    gotu_filtered = cov_filtered["gotu"]
+    cov_filtered = cov.loc[cov["percent_covered"] >= cutoff]
+    cov_filtered = cov_filtered.sort_values(by="percent_covered", ascending=False)
+    gotu_filtered = cov_filtered["genome_id"]
     return cov_filtered, gotu_filtered
 
 

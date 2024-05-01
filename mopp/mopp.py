@@ -15,7 +15,7 @@ from mopp._defaults import (
     DESC_STRAT,
     DESC_WOLTKA_DB,
     DESC_PATTERN,
-    DESC_ZEBRA,
+    DESC_GENOME_LENGTHS,
     DESC_CUTOFF,
     DESC_INPUT_TRIMMED,
     DESC_PREFIX,
@@ -39,12 +39,13 @@ def mopp():
 
 
 @mopp.command(help=MSG_WELCOME_WORKFLOW)
+# fmt: off
 @click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
 @click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)  # wol bt2 index
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
-@click.option("-z", "--zebra", required=True, help=DESC_ZEBRA)
+@click.option("-g", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_GENOME_LENGTHS)
 @click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
 @click.option("-ref", "--refdb", required=True, help=DESC_REFDB)  # index wol.fna
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)  # index prefix
@@ -61,13 +62,14 @@ def mopp():
 @click.option(
     "-strat", "--stratification", is_flag=True, default=False, help=DESC_STRAT
 )
+# fmt: on
 def workflow(
     input_dir,
     output_dir,
     metadata,
     index,
     threads,
-    zebra,
+    genome_lengths,
     cutoff,
     refdb,
     prefix,
@@ -76,14 +78,7 @@ def workflow(
     stratification,
 ):
     create_folder_without_clear(Path(output_dir))
-
-    logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
+    logger = logger_setup(my_logger, output_dir)
 
     try:
         outdir_trimmed = Path(output_dir) / "cat"
@@ -92,7 +87,7 @@ def workflow(
         outdir_aligned = Path(output_dir) / "aligned"
         outdir_aligned_samfiles = outdir_aligned_metaG / "samfiles"
         outdir_cov = Path(output_dir) / "coverages"
-        outdir_cov_file = Path(output_dir) / "coverages" / "coverages.tsv"
+        outdir_cov_file = Path(output_dir) / "coverages" / "coverage_percentage.txt"
         outdir_index = Path(output_dir) / "index"
         outdir_index_path = outdir_index / f"{prefix}_bt2index" / prefix
         outdir_features = Path(output_dir) / "features"
@@ -101,7 +96,9 @@ def workflow(
         align_files(
             outdir_trimmed, outdir_aligned_metaG, "*metaG*.fq.gz", index, threads
         )
-        calculate_genome_coverages(zebra, outdir_aligned_metaG_samfiles, outdir_cov)
+        calculate_coverages(
+            str(outdir_aligned_metaG_samfiles), str(outdir_cov), genome_lengths
+        )
         genome_extraction(outdir_cov_file, cutoff, refdb, outdir_index, prefix, threads)
         align_files(
             outdir_trimmed, outdir_aligned, "*.fq.gz", str(outdir_index_path), threads
@@ -128,13 +125,7 @@ def workflow(
 def trim(input_dir, output_dir, metadata, threads):
     create_folder_without_clear(Path(output_dir))
 
-    logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
+    logger = logger_setup(my_logger, output_dir)
 
     try:
         trim_files(input_dir, output_dir, metadata, threads)
@@ -151,13 +142,7 @@ def trim(input_dir, output_dir, metadata, threads):
 def align(input_dir, output_dir, pattern, index, threads):
     create_folder_without_clear(Path(output_dir))
 
-    logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
+    logger = logger_setup(my_logger, output_dir)
 
     try:
         align_files(input_dir, output_dir, pattern, index, threads)
@@ -169,13 +154,9 @@ def align(input_dir, output_dir, pattern, index, threads):
 # fmt: off
 @click.option("-i", "--input-dir", type=click.Path(exists=True), required=True, help=DESC_INPUT_SAM,)
 @click.option("-o", "--output-dir", type=click.Path(exists=False), required=True, help=DESC_OUTPUT)
-@click.option("-g", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_ZEBRA)
+@click.option("-g", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_GENOME_LENGTHS)
 # fmt: on
 def cov(input_dir, output_dir, genome_lengths):
-    if Path(output_dir).exists():
-        click.echo("Output directory already exists!")
-        sys.exit(1)
-
     create_folder_without_clear(output_dir)
     logger = logger_setup(my_logger, output_dir)
 
@@ -198,13 +179,7 @@ def cov(input_dir, output_dir, genome_lengths):
 def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
     create_folder_without_clear(Path(output_dir))
 
-    logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
+    logger = logger_setup(my_logger, output_dir)
 
     try:
         genome_extraction(input_cov, cutoff, refdb, output_dir, prefix, threads)
@@ -230,13 +205,7 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
 def feature_table(rank, input_dir, output_dir, woltka_database, stratification):
     create_folder_without_clear(Path(output_dir))
 
-    logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
+    logger = logger_setup(my_logger, output_dir)
 
     rank_list = [s.strip() for s in rank.split(",")]
 

@@ -17,7 +17,9 @@ def ft_generation(indir, outdir, db, rank: list, stratification):
         p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, error = p.communicate()
         if p.returncode != 0:
-            logger.error(f"{message} failed with code {p.returncode} and error {error}")
+            logger.error(
+                f"{message} failed with code {p.returncode} and error {error.decode('utf-8')}"
+            )
         else:
             logger.info(f"{message} finished")
 
@@ -33,7 +35,7 @@ def ft_generation(indir, outdir, db, rank: list, stratification):
             output, error = p.communicate()
             if p.returncode != 0:
                 logger.error(
-                    f"{message} failed with code {p.returncode} and error {error}"
+                    f"{message} failed with code {p.returncode} and error {error.decode('utf-8')}"
                 )
             else:
                 logger.info(f"{message} finished")
@@ -45,7 +47,9 @@ def ft_generation(indir, outdir, db, rank: list, stratification):
         p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, error = p.communicate()
         if p.returncode != 0:
-            logger.error(f"{message} failed with code {p.returncode} and error {error}")
+            logger.error(
+                f"{message} failed with code {p.returncode} and error {error.decode('utf-8')}"
+            )
         else:
             logger.info(f"{message} finished")
 
@@ -61,7 +65,7 @@ def ft_generation(indir, outdir, db, rank: list, stratification):
             output, error = p.communicate()
             if p.returncode != 0:
                 logger.error(
-                    f"{message} failed with code {p.returncode} and error {error}"
+                    f"{message} failed with code {p.returncode} and error {error.decode('utf-8')}"
                 )
             else:
                 logger.info(f"{message} finished")
