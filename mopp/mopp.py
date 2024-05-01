@@ -1,3 +1,4 @@
+import sys
 import time
 import click
 import logging
@@ -15,16 +16,17 @@ from mopp._defaults import (
     DESC_STRAT,
     DESC_WOLTKA_DB,
     DESC_PATTERN,
-    DESC_ZEBRA,
+    DESC_GENOME_LENGTHS,
     DESC_CUTOFF,
     DESC_INPUT_TRIMMED,
     DESC_PREFIX,
     DESC_REFDB,
     DESC_INPUT_COV,
+    DESC_COMPRESS_SAM,
 )
 from mopp.modules.trim import trim_files
 from mopp.modules.align import align_files
-from mopp.modules.coverages import calculate_genome_coverages
+from mopp.modules.coverages import calculate_coverages
 from mopp.modules.index import genome_extraction
 from mopp.modules.features import ft_generation
 from mopp.modules.utils import create_folder_without_clear
@@ -41,12 +43,13 @@ def mopp():
 
 
 @mopp.command(help=MSG_WELCOME_WORKFLOW)
-@click.option("-i", "--input_dir", required=True, help=DESC_INPUT)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
+# fmt: off
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)  # wol bt2 index
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
-@click.option("-z", "--zebra", required=True, help=DESC_ZEBRA)
+@click.option("-g", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_GENOME_LENGTHS)
 @click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
 @click.option("-ref", "--refdb", required=True, help=DESC_REFDB)  # index wol.fna
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)  # index prefix
@@ -63,13 +66,14 @@ def mopp():
 @click.option(
     "-strat", "--stratification", is_flag=True, default=False, help=DESC_STRAT
 )
+# fmt: on
 def workflow(
     input_dir,
     output_dir,
     metadata,
     index,
     threads,
-    zebra,
+    genome_lengths,
     cutoff,
     refdb,
     prefix,
@@ -80,7 +84,7 @@ def workflow(
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -94,7 +98,7 @@ def workflow(
         outdir_aligned = Path(output_dir) / "aligned"
         outdir_aligned_samfiles = outdir_aligned_metaG / "samfiles"
         outdir_cov = Path(output_dir) / "coverages"
-        outdir_cov_file = Path(output_dir) / "coverages" / "coverages.tsv"
+        outdir_cov_file = Path(output_dir) / "coverages" / "coverage_percentage.txt"
         outdir_index = Path(output_dir) / "index"
         outdir_index_path = outdir_index / f"{prefix}_bt2index" / prefix
         outdir_features = Path(output_dir) / "features"
@@ -103,7 +107,9 @@ def workflow(
         align_files(
             outdir_trimmed, outdir_aligned_metaG, "*metaG*.fq.gz", index, threads
         )
-        calculate_genome_coverages(zebra, outdir_aligned_metaG_samfiles, outdir_cov)
+        calculate_coverages(
+            str(outdir_aligned_metaG_samfiles), str(outdir_cov), genome_lengths
+        )
         genome_extraction(outdir_cov_file, cutoff, refdb, outdir_index, prefix, threads)
         align_files(
             outdir_trimmed, outdir_aligned, "*.fq.gz", str(outdir_index_path), threads
@@ -123,15 +129,15 @@ def workflow(
 
 
 @mopp.command()
-@click.option("-i", "--input_dir", required=True, help=DESC_INPUT)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
 def trim(input_dir, output_dir, metadata, threads):
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -145,16 +151,17 @@ def trim(input_dir, output_dir, metadata, threads):
 
 
 @mopp.command()
-@click.option("-i", "--input_dir", required=True, help=DESC_INPUT_TRIMMED)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT_TRIMMED)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option("-p", "--pattern", required=True, help=DESC_PATTERN)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
-def align(input_dir, output_dir, pattern, index, threads):
+@click.option("--compress-samfiles", is_flag=True, help=DESC_COMPRESS_SAM)
+def align(input_dir, output_dir, pattern, index, threads, compress_samfiles):
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_align_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -162,44 +169,51 @@ def align(input_dir, output_dir, pattern, index, threads):
     logger.addHandler(stream_handler)
 
     try:
-        align_files(input_dir, output_dir, pattern, index, threads)
+        align_files(
+            input_dir, output_dir, pattern, index, threads, compress=compress_samfiles
+        )
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
 
 @mopp.command()
-@click.option("-i", "--input_dir", required=True, help=DESC_INPUT_SAM)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
-@click.option("-z", "--zebra", required=True, help=DESC_ZEBRA)
-def cov(input_dir, output_dir, zebra):
-    create_folder_without_clear(Path(output_dir))
+# fmt: off
+@click.option("-i", "--input-dir", type=click.Path(exists=True), required=True, help=DESC_INPUT_SAM,)
+@click.option("-o", "--output-dir", type=click.Path(exists=False), required=True, help=DESC_OUTPUT)
+@click.option("-g", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_GENOME_LENGTHS)
+# fmt: on
+def cov(input_dir, output_dir, genome_lengths):
+    create_folder_without_clear(output_dir)
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
     logger.addHandler(stream_handler)
 
+    logger.info("Calculation of genome covarges started.")
     try:
-        calculate_genome_coverages(zebra, input_dir, output_dir)
+        calculate_coverages(input_dir, output_dir, genome_lengths)
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
+    else:
+        logger.info("Calculation of genome covarges finished.")
 
 
 @mopp.command()
-@click.option("-i", "--input_cov", required=True, help=DESC_INPUT_COV)
+@click.option("-i", "--input-cov", required=True, help=DESC_INPUT_COV)
 @click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
 @click.option("-ref", "--refdb", required=True, help=DESC_REFDB)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
 def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -214,8 +228,8 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
 
 
 @mopp.command()
-@click.option("-i", "--input_dir", required=True, help=DESC_INPUT_SAM)
-@click.option("-o", "--output_dir", required=True, help=DESC_OUTPUT)
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT_SAM)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option(
     "-r",
     "--rank",
@@ -231,7 +245,7 @@ def feature_table(rank, input_dir, output_dir, woltka_database, stratification):
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_{timestamp}.log")
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()

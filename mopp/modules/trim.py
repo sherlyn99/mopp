@@ -82,7 +82,7 @@ def _rename_files(indir, outdir, identifier, omic, stem):
     )
     output, error = p.communicate()
     if p.returncode != 0:
-        err = f"Renaming {stem} trimmed files failed with code {p.returncode} and error {error}"
+        err = f"Renaming {stem} trimmed files failed with code {p.returncode} and error {error.decode('utf-8')}"
         logger.error(err)
     else:
         logger.info(f"Renaming {stem} trimmed files finished")
@@ -104,7 +104,7 @@ def _run_trim_paired(r1_file, r2_file, outdir):
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     if p.returncode != 0:
-        err = f"{r1_file.name} & R2 trimming failed with code {p.returncode} and error {error}"
+        err = f"{r1_file.name} & R2 trimming failed with code {p.returncode} and error {error.decode('utf-8')}"
         logger.error(err)
     else:
         logger.info(f"{r1_file.name} & R2 trimming finished")
@@ -127,7 +127,7 @@ def _run_trim_metars(r1_file, outdir):
     output, error = p.communicate()
     if p.returncode != 0:
         logger.error(
-            f"{r1_file.name} trimming failed with code {p.returncode} and error {error}"
+            f"{r1_file.name} trimming failed with code {p.returncode} and error {error.decode('utf-8')}"
         )
     else:
         logger.info(f"{r1_file.name} trimming finished")

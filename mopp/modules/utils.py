@@ -1,8 +1,18 @@
+import time
 import shutil
+import logging
+from pathlib import Path
 from multiprocessing import Pool
 
 
+def check_folder_nonexistent(dir):
+    dir = Path(dir)
+    if dir.exists():
+        raise Exception("Output directory already exists.")
+
+
 def create_folder_without_clear(current_dir):
+    current_dir = Path(current_dir)
     if current_dir.exists() and current_dir.is_dir():
         return
     else:
@@ -10,6 +20,7 @@ def create_folder_without_clear(current_dir):
 
 
 def create_folder(current_dir):
+    current_dir = Path(current_dir)
     if current_dir.exists() and current_dir.is_dir():
         clear_folder(current_dir)
     else:
@@ -17,6 +28,7 @@ def create_folder(current_dir):
 
 
 def clear_folder(current_dir):
+    current_dir = Path(current_dir)
     for item in current_dir.iterdir():
         if item.is_file():
             item.unlink()

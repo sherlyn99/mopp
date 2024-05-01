@@ -1,4 +1,5 @@
 import glob
+import lzma
 import logging
 import subprocess
 from pathlib import Path
@@ -8,7 +9,7 @@ from mopp.modules.utils import create_folder
 logger = logging.getLogger("mopp")
 
 
-def align_files(indir, outdir, pattern, INDEX, nthreads):
+def align_files(indir, outdir, pattern, INDEX, nthreads, compress=True):
     outdir_aligned = Path(outdir)
     create_folder(outdir_aligned)
 
@@ -24,10 +25,10 @@ def align_files(indir, outdir, pattern, INDEX, nthreads):
     suffix = INDEX.split("/")[-1]
 
     for filepath in input_files:
-        _run_align(filepath, suffix, outdir_aligned, INDEX, nthreads)
+        _run_align(filepath, suffix, outdir_aligned, INDEX, nthreads, compress)
 
 
-def _run_align(filepath, suffix, outdir, INDEX, nthreads):
+def _run_align(filepath, suffix, outdir, INDEX, nthreads, compress=True):
     identifier = Path(filepath).name.split(".fq.gz")[0]
     commands = _commands_generation_bowtie2(
         filepath, identifier, suffix, outdir, INDEX, nthreads
@@ -36,10 +37,21 @@ def _run_align(filepath, suffix, outdir, INDEX, nthreads):
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     if p.returncode != 0:
-        err = f"{Path(filepath).name} alignment failed with code {p.returncode} and error {error}"
+        err = f"{Path(filepath).name} alignment failed with code {p.returncode} and error {error.decode('utf-8')}"
         logger.error(err)
     else:
         logger.info(f"{Path(filepath).name} alignment finished")
+
+    if compress:
+        file_to_compress = Path(outdir) / "samfiles" / f"{identifier}_{suffix}.sam"
+        file_compressed = Path(outdir) / "samfiles" / f"{identifier}_{suffix}.sam.xz"
+
+        with open(file_to_compress, "rb") as input_file, lzma.open(
+            file_compressed, "wb"
+        ) as output_file:
+            output_file.writelines(input_file)
+        file_to_compress.unlink()
+        logger.info(f"{Path(filepath).name} samfile zipped.")
 
 
 def _commands_generation_bowtie2(filepath, identifier, suffix, outdir, INDEX, nthreads):
