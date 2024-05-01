@@ -45,7 +45,8 @@ DESC_OUTPUT = (
 DESC_INDEX = "Genome index."
 DESC_NTHREADS = "Number of threads. [default: 4]."
 # module: align
-DESC_PATTERN = "File patterns to include for alignment"
+DESC_PATTERN = "File patterns to include for alignment."
+DESC_COMPRESS_SAM = "If yes, samfiles generated will be compressed."
 # module: features
 DESC_RANK = "Taxonomic rank."
 DESC_STRAT = "Enables uniref stratification. Applies to all ranks. Default: off"

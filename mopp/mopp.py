@@ -1,4 +1,5 @@
 import sys
+import time
 import click
 import logging
 from pathlib import Path
@@ -21,16 +22,19 @@ from mopp._defaults import (
     DESC_PREFIX,
     DESC_REFDB,
     DESC_INPUT_COV,
+    DESC_COMPRESS_SAM,
 )
 from mopp.modules.trim import trim_files
 from mopp.modules.align import align_files
 from mopp.modules.coverages import calculate_coverages
 from mopp.modules.index import genome_extraction
 from mopp.modules.features import ft_generation
-from mopp.modules.utils import create_folder_without_clear, logger_setup
+from mopp.modules.utils import create_folder_without_clear
 
 
-my_logger = logging.getLogger("mopp")
+logger = logging.getLogger("mopp")
+timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 
 
 @click.group(help=MSG_WELCOME)
@@ -78,7 +82,14 @@ def workflow(
     stratification,
 ):
     create_folder_without_clear(Path(output_dir))
-    logger = logger_setup(my_logger, output_dir)
+
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
 
     try:
         outdir_trimmed = Path(output_dir) / "cat"
@@ -125,7 +136,13 @@ def workflow(
 def trim(input_dir, output_dir, metadata, threads):
     create_folder_without_clear(Path(output_dir))
 
-    logger = logger_setup(my_logger, output_dir)
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
 
     try:
         trim_files(input_dir, output_dir, metadata, threads)
@@ -139,13 +156,22 @@ def trim(input_dir, output_dir, metadata, threads):
 @click.option("-p", "--pattern", required=True, help=DESC_PATTERN)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
-def align(input_dir, output_dir, pattern, index, threads):
+@click.option("--compress-samfiles", is_flag=True, help=DESC_COMPRESS_SAM)
+def align(input_dir, output_dir, pattern, index, threads, compress_samfiles):
     create_folder_without_clear(Path(output_dir))
 
-    logger = logger_setup(my_logger, output_dir)
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_align_{timestamp}.log")
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
 
     try:
-        align_files(input_dir, output_dir, pattern, index, threads)
+        align_files(
+            input_dir, output_dir, pattern, index, threads, compress=compress_samfiles
+        )
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
@@ -158,7 +184,14 @@ def align(input_dir, output_dir, pattern, index, threads):
 # fmt: on
 def cov(input_dir, output_dir, genome_lengths):
     create_folder_without_clear(output_dir)
-    logger = logger_setup(my_logger, output_dir)
+
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
 
     logger.info("Calculation of genome covarges started.")
     try:
@@ -179,7 +212,13 @@ def cov(input_dir, output_dir, genome_lengths):
 def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
     create_folder_without_clear(Path(output_dir))
 
-    logger = logger_setup(my_logger, output_dir)
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
 
     try:
         genome_extraction(input_cov, cutoff, refdb, output_dir, prefix, threads)
@@ -205,7 +244,13 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
 def feature_table(rank, input_dir, output_dir, woltka_database, stratification):
     create_folder_without_clear(Path(output_dir))
 
-    logger = logger_setup(my_logger, output_dir)
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
 
     rank_list = [s.strip() for s in rank.split(",")]
 

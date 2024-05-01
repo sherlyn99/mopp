@@ -5,21 +5,6 @@ from pathlib import Path
 from multiprocessing import Pool
 
 
-def logger_setup(logger, output_dir):
-    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-    formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-
-    logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_cov_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-
-    return logger
-
-
 def check_folder_nonexistent(dir):
     dir = Path(dir)
     if dir.exists():
