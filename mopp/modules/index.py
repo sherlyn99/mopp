@@ -161,7 +161,7 @@ def _build_db(output_fna_file: str, outdir: str, prefix: str, nthreads: int):
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     if p.returncode != 0:
-        err = f"{prefix} indexdb failed with code {p.returncode} and error {error}"
+        err = f"{prefix} indexdb failed with code {p.returncode} and error {error.decode('utf-8')}"
         logger.error(err)
     else:
         logger.info(f"{prefix} indexdb created")

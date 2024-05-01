@@ -36,7 +36,7 @@ def _run_align(filepath, suffix, outdir, INDEX, nthreads):
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     if p.returncode != 0:
-        err = f"{Path(filepath).name} alignment failed with code {p.returncode} and error {error}"
+        err = f"{Path(filepath).name} alignment failed with code {p.returncode} and error {error.decode('utf-8')}"
         logger.error(err)
     else:
         logger.info(f"{Path(filepath).name} alignment finished")
