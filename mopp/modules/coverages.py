@@ -2,7 +2,7 @@ import logging
 from micov._modules import cli_compress
 from mopp.modules.utils import create_folder_without_clear
 
-
+POLARS_SKIP_CPU_CHECK = True
 logger = logging.getLogger("mopp")
 
 

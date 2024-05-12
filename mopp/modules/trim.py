@@ -37,8 +37,7 @@ def trim_files(indir, outdir, md_path, threads):
     # if outdir already existed, will clear content
     outdir_cat = Path(outdir)
     outdir_trimmed = Path(outdir_cat) / "trimmed_reports"
-    create_folder(outdir_cat)
-    create_folder(outdir_trimmed)
+    #moved file creation to mopp.py
 
     arg_list_metars = []
     arg_list_trimpaired = []
@@ -62,7 +61,6 @@ def trim_files(indir, outdir, md_path, threads):
                 arg_list_catpaired.append(
                     (outdir_trimmed, outdir_cat, identifier, omic, r2_stem)
                 )
-
     pool_processes(
         threads,
         [[run_trim_metars, arg_list_metars], [run_trim_paired, arg_list_trimpaired]],
