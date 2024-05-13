@@ -193,13 +193,13 @@ def cov(input_dir, output_dir, genome_lengths):
     stream_handler.setFormatter(formatter)
     logger.addHandler(stream_handler)
 
-    logger.info("Calculation of genome covarges started.")
+    logger.info("Calculation of genome coverages started.")
     try:
         calculate_coverages(input_dir, output_dir, genome_lengths)
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
     else:
-        logger.info("Calculation of genome covarges finished.")
+        logger.info("Calculation of genome coverages finished.")
 
 
 @mopp.command()
