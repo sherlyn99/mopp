@@ -11,12 +11,6 @@ logger = logging.getLogger("mopp")
 
 def align_files(indir, outdir, pattern, INDEX, nthreads, compress=True):
     outdir_aligned = Path(outdir)
-    create_folder(outdir_aligned)
-
-    outdir_aligned_samfiles = outdir_aligned / "samfiles"
-    outdir_aligned_bowfiles = outdir_aligned / "bowfiles"
-    create_folder(outdir_aligned_samfiles)
-    create_folder(outdir_aligned_bowfiles)
 
     file_pattern = str(Path(indir) / pattern)
     input_files = glob.glob(file_pattern)

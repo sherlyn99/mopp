@@ -30,6 +30,7 @@ from mopp.modules.coverages import calculate_coverages
 from mopp.modules.index import genome_extraction
 from mopp.modules.features import ft_generation
 from mopp.modules.utils import create_folder_without_clear
+from mopp.modules.utils import create_folder
 
 
 logger = logging.getLogger("mopp")
@@ -136,6 +137,11 @@ def workflow(
 def trim(input_dir, output_dir, metadata, threads):
     create_folder_without_clear(Path(output_dir))
 
+    outdir_cat = Path(output_dir)
+    outdir_trimmed = Path(outdir_cat) / "trimmed_reports"
+    create_folder(outdir_cat)
+    create_folder(outdir_trimmed)
+
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
     filer_handler.setFormatter(formatter)
@@ -146,6 +152,7 @@ def trim(input_dir, output_dir, metadata, threads):
 
     try:
         trim_files(input_dir, output_dir, metadata, threads)
+        
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
@@ -159,6 +166,14 @@ def trim(input_dir, output_dir, metadata, threads):
 @click.option("--compress-samfiles", is_flag=True, help=DESC_COMPRESS_SAM)
 def align(input_dir, output_dir, pattern, index, threads, compress_samfiles):
     create_folder_without_clear(Path(output_dir))
+    
+    outdir_aligned = Path(output_dir)
+    create_folder(outdir_aligned)
+
+    outdir_aligned_samfiles = outdir_aligned / "samfiles"
+    outdir_aligned_bowfiles = outdir_aligned / "bowfiles"
+    create_folder(outdir_aligned_samfiles)
+    create_folder(outdir_aligned_bowfiles)
 
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(f"{output_dir}/mopp_align_{timestamp}.log")
@@ -169,6 +184,7 @@ def align(input_dir, output_dir, pattern, index, threads, compress_samfiles):
     logger.addHandler(stream_handler)
 
     try:
+        
         align_files(
             input_dir, output_dir, pattern, index, threads, compress=compress_samfiles
         )
