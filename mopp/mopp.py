@@ -96,7 +96,7 @@ def workflow(
         outdir_aligned_metaG = Path(output_dir) / "aligned_metaG"
         outdir_aligned_metaG_samfiles = outdir_aligned_metaG / "samfiles"
         outdir_aligned = Path(output_dir) / "aligned"
-        outdir_aligned_samfiles = outdir_aligned_metaG / "samfiles"
+        outdir_aligned_samfiles = outdir_aligned / "samfiles"
         outdir_cov = Path(output_dir) / "coverages"
         outdir_cov_file = Path(output_dir) / "coverages" / "coverage_percentage.txt"
         outdir_index = Path(output_dir) / "index"
