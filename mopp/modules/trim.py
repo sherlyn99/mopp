@@ -34,8 +34,7 @@ def trim_files(indir, outdir, md_path, threads):
     # load metadata into md_dict
     md_dict = load_metadata(md_path)
 
-    # create ./trimmed
-    # if outdir already existed, will clear content
+    # create ./trimmed, if outdir already existed, will not clear content, might overwrite
     outdir_cat = Path(outdir)
     outdir_trimmed = Path(outdir_cat) / "trimmed_reports"
     create_folder_without_clear(outdir_cat)
@@ -135,6 +134,7 @@ def _run_trim_metars(r1_file, outdir):
 
 
 def _cat_paired(indir, outdir, identifier, omic, stem):
+    stem = stem.split('R2')[0]
     commands = [
         f"cat {indir}/{stem}*.fq.gz > {outdir}/{identifier}_{omic}_trimmed.fq.gz"
     ]
