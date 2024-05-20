@@ -4,7 +4,7 @@ import logging
 import subprocess
 import pandas as pd
 from pathlib import Path
-from mopp.modules.utils import create_folder
+from mopp.modules.utils import create_folder, create_folder_without_clear
 
 
 logger = logging.getLogger("mopp")
@@ -23,7 +23,7 @@ def genome_extraction(
     """
     # create output folder, erase if existed
     outdir_index = Path(outdir)
-    create_folder(outdir_index)
+    create_folder_without_clear(outdir_index)
 
     cov_filtered, gotu_filtered = _cov_filter(cov, cutoff)
     gotu_filtered_list = _cov_filter_write(
@@ -31,7 +31,7 @@ def genome_extraction(
     )
 
     output_bt2index = outdir_index / f"{prefix}_bt2index"
-    create_folder(output_bt2index)
+    create_folder_without_clear(output_bt2index)
     output_fna_file = _genome_extract(
         gotu_filtered_list, refdb, str(output_bt2index), prefix
     )

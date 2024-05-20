@@ -1,14 +1,14 @@
 import logging
 import subprocess
 from pathlib import Path
-from mopp.modules.utils import create_folder
+from mopp.modules.utils import create_folder, create_folder_without_clear
 
 logger = logging.getLogger("mopp")
 
 
 def ft_generation(indir, outdir, db, rank: list, stratification):
     outdir = Path(outdir)
-    create_folder(outdir)
+    create_folder_without_clear(outdir)
 
     if "genus" in rank:
         message = "genus level feature table generation"

@@ -3,7 +3,7 @@ import lzma
 import logging
 import subprocess
 from pathlib import Path
-from mopp.modules.utils import create_folder
+from mopp.modules.utils import create_folder, create_folder_without_clear
 
 
 logger = logging.getLogger("mopp")
@@ -11,12 +11,12 @@ logger = logging.getLogger("mopp")
 
 def align_files(indir, outdir, pattern, INDEX, nthreads, compress=True):
     outdir_aligned = Path(outdir)
-    create_folder(outdir_aligned)
+    create_folder_without_clear(outdir_aligned)
 
     outdir_aligned_samfiles = outdir_aligned / "samfiles"
     outdir_aligned_bowfiles = outdir_aligned / "bowfiles"
-    create_folder(outdir_aligned_samfiles)
-    create_folder(outdir_aligned_bowfiles)
+    create_folder_without_clear(outdir_aligned_samfiles)
+    create_folder_without_clear(outdir_aligned_bowfiles)
 
     file_pattern = str(Path(indir) / pattern)
     input_files = glob.glob(file_pattern)
