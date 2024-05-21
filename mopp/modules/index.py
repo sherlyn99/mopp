@@ -4,7 +4,7 @@ import logging
 import subprocess
 import pandas as pd
 from pathlib import Path
-from mopp.modules.utils import create_folder, create_folder_without_clear
+from mopp.modules.utils import create_folder_without_clear
 
 
 logger = logging.getLogger("mopp")
