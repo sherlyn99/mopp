@@ -1,7 +1,7 @@
 import logging
 import subprocess
 from pathlib import Path
-from mopp.modules.utils import create_folder
+from mopp.modules.utils import create_folder_without_clear
 from mopp.modules.utils import pool_processes
 from mopp.modules.metadata import load_metadata
 from multiprocessing import Pool
@@ -37,8 +37,8 @@ def trim_files(indir, outdir, md_path, threads):
     # if outdir already existed, will clear content
     outdir_cat = Path(outdir)
     outdir_trimmed = Path(outdir_cat) / "trimmed_reports"
-    create_folder(outdir_cat)
-    create_folder(outdir_trimmed)
+    create_folder_without_clear(outdir_cat)
+    create_folder_without_clear(outdir_trimmed)
 
     arg_list_metars = []
     arg_list_trimpaired = []
