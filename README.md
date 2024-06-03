@@ -24,6 +24,7 @@ Different use cases may have more requirements, but for every use case, the foll
 ***
 <h2> <p align ="center"> Installation </p> </h2>
 
+MOPP works with python >= 3.8 and linux-based web servers. 
 To install mopp using pip, run the following command
 ```
 conda env create -f mopp.yml -n mopp
