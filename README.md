@@ -26,8 +26,8 @@ Different use cases may have more requirements, but for every use case, the foll
 
 To install mopp using pip, run the following command
 ```
-mamba env create -f mopp.yml -n mopp
-mamba activate mopp
+conda env create -f mopp.yml -n mopp
+conda activate mopp
 pip3 install mopp
 ```
 
