@@ -27,7 +27,8 @@ Different use cases may have more requirements, but for every use case, the foll
 MOPP works with python >= 3.8 and linux-based web servers. 
 To install mopp using pip, run the following command
 ```
-conda env create -f mopp.yml -n mopp
+conda create -n mopp python=3.8
+conda install -c conda-forge -c bioconda bowtie2 trim-galore woltka
 conda activate mopp
 pip3 install mopp
 ```
