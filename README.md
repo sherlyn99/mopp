@@ -26,14 +26,16 @@ Different use cases may have more requirements, but for every use case, the foll
 
 To install mopp using pip, run the following command
 ```
+mamba env create -f mopp.yml -n mopp
+mamba activate mopp
 pip3 install mopp
 ```
 
-To install the most up to date version of mopp, run the following command
+To install the most up-to-date version of mopp, run the following command
 ```
 git clone https://github.com/sherlyn99/mopp.git
 cd mopp
-conda env create -f mopp.yml
+conda env create -f mopp.yml -n mopp
 conda activate mopp
 pip install -e .
 ```
@@ -41,7 +43,7 @@ or use mamba for faster installation
 ```
 git clone https://github.com/sherlyn99/mopp.git
 cd mopp
-conda install mamba -n base -c conda-forge
+conda install mamba -n base -c conda-forge # skip if mamba is already installed
 mamba env create -f mopp.yml
 mamba activate mopp
 pip install -e .
