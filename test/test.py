@@ -25,7 +25,8 @@ def tearDown(dir):
 
 
 class Test(unittest.TestCase):
-
+    def tet222(self):
+        print('hello')
     def test_align_files(self):
         test_dict =  md_to_dict(load_metadata('./test/data/metadata.tsv'))
 
