@@ -55,6 +55,7 @@ def gen_metadata(input_directory, output_directory):
     })
 
     df.to_csv(Path(output_directory) / 'metadata.tsv', sep='\t', index=False)
+    return Path(output_directory) / 'metadata.tsv'
 
 
 def load_metadata(md_path):
