@@ -2,8 +2,59 @@ import time
 import logging
 import pandas as pd
 from collections import defaultdict
+import glob
+from pathlib import Path
+import re
 
 logger = logging.getLogger("mopp")
+
+
+
+def gen_metadata(input_directory, output_directory):
+    file_paths = glob.glob(input_directory + '/*.fq.gz') + glob.glob(input_directory + '/*.fastq.gz')
+
+    # Define a function to guess identifier and omic
+    def guess_identifier_omic(filename):
+        if 'metars' in filename.lower():
+            omic = 'metaRS'
+        elif 'metat' in filename.lower():
+            omic = 'metaT'
+        elif 'metag' in filename.lower():
+            omic = 'metaG'
+        else:
+            omic = None
+            identifier = None
+            logger.error(f"Unable to determine omic and identifier of {filename}")
+        
+        if omic:
+            identifier = filename.split(omic)[0]
+        
+        
+        return identifier, omic
+
+    sample_name = []
+    identifiers = []
+    omics = []
+    strands = []
+    for file_path in file_paths:
+        
+        file_name = file_path.split('/')[-1]
+        identifier, omic = guess_identifier_omic(file_name)
+        strand = 'R1' if 'R1' in file_name.upper() else 'R2' if 'R2' in file_name.upper() else None
+        sample_name.append(file_name)
+        #Remove overhang underscores
+        identifiers.append(re.sub(r'^_+|_+$', '', identifier))
+        omics.append(omic)
+        strands.append(strand)
+
+    df = pd.DataFrame({
+    'sample_name': sample_name,
+    'identifier': identifiers,
+    'omic': omics,
+    'strand': strands
+    })
+
+    df.to_csv(Path(output_directory) / 'metadata.tsv', sep='\t', index=False)
 
 
 def load_metadata(md_path):
