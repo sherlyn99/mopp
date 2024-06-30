@@ -12,7 +12,7 @@ import unittest
 #from mopp._defaults import (DESC_MD, DESC_INPUT)
 from mopp.modules import trim
 from mopp.modules import align
-from mopp.modules.metadata import _md_to_dict, load_metadata, gen_metadata
+from mopp.modules import (load_metadata, md_to_dict, validate_metadata)
 import logging
 
 def tearDown(dir):
@@ -25,16 +25,7 @@ def tearDown(dir):
 
 
 class Test(unittest.TestCase):
-    def test_run_metadatagen(self):
-        test_dict = load_metadata('./test/data/metadata.tsv')
-        generated_metadata = load_metadata(gen_metadata('./test/data', './test/data/out'))
 
-        print(test_dict)
-        print(generated_metadata)
-
-        self.assertEqual(test_dict, generated_metadata)
-
-    '''
     def test_align_files(self):
         test_dict =  md_to_dict(load_metadata('./test/data/metadata.tsv'))
 
@@ -87,9 +78,6 @@ class Test(unittest.TestCase):
         self.assertEqual(test_sam, manual_alignment_sam)
 
         tearDown("./test/out")
-    
-
-'''
 
 
     ### METADATA FUNCTIONS
@@ -273,5 +261,5 @@ class Test(unittest.TestCase):
 """
 
 if __name__ == '__main__':
-    tearDown("./test/data/out")
+    tearDown("./test/out")
     unittest.main()
