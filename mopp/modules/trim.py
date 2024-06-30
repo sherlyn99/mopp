@@ -29,9 +29,10 @@ def cat_paired(args):
     return _cat_paired(outdir_trimmed, outdir_cat, identifier, omic, stem)
 
 
-def trim_files(indir, outdir, md_path, threads):
+def trim_files(indir, outdir, md_path, threads, specific=None):
     # load metadata into md_dict
     md_dict = load_metadata(md_path)
+    print(md_dict)
 
     # create ./trimmed
     # if outdir already existed, will clear content
@@ -47,6 +48,8 @@ def trim_files(indir, outdir, md_path, threads):
 
     for identifier, omic_dict in md_dict.items():
         for omic in omic_dict.keys():
+            if omic_dict[omic][0] == -1: continue
+            if specific and omic != specific: continue
             r1_file = Path(indir) / omic_dict[omic][0]
             r1_stem = str.split(str(r1_file.name), ".")[0]
 

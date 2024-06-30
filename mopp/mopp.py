@@ -280,5 +280,139 @@ def generate_metadata(input_dir, output_dir):
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
+
+
+
+@mopp.command()
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
+@click.option("-m", "--metadata", required=True, help=DESC_MD)
+@click.option("-x", "--index", required=True, help=DESC_INDEX)  
+@click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
+@click.option("-g", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_GENOME_LENGTHS)
+@click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
+@click.option("-ref", "--refdb", required=True, help=DESC_REFDB)  
+@click.option("-p", "--prefix", required=True, help=DESC_PREFIX)
+
+def metaG(
+    input_dir,
+    output_dir,
+    metadata,
+    index,
+    threads,
+    genome_lengths,
+    cutoff,
+    refdb,
+    prefix,
+):
+    create_folder_without_clear(Path(output_dir))
+
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_metaG_{timestamp}.log")
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    try:
+        outdir_trimmed = Path(output_dir) / "cat"
+        outdir_aligned_metaG = Path(output_dir) / "aligned_metaG"
+        outdir_aligned_metaG_samfiles = outdir_aligned_metaG / "samfiles"
+        outdir_cov = Path(output_dir) / "coverages"
+        outdir_cov_file = Path(output_dir) / "coverages" / "coverage_percentage.txt"
+        outdir_index = Path(output_dir) / "index"
+
+
+        trim_files(input_dir, outdir_trimmed, metadata, threads, "metaG")
+        align_files(
+            outdir_trimmed, outdir_aligned_metaG, "*metaG*.fq.gz", index, threads
+        )
+        calculate_coverages(
+            str(outdir_aligned_metaG_samfiles), str(outdir_cov), genome_lengths
+        )
+        genome_extraction(outdir_cov_file, cutoff, refdb, outdir_index, prefix, threads)
+        
+        logger.info("metaG finished")
+
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}", exc_info=True)
+
+@mopp.command()
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
+@click.option("-m", "--metadata", required=True, help=DESC_MD)
+@click.option("-x", "--index", required=True, help=DESC_INDEX)  
+@click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
+def metaT(
+    input_dir,
+    output_dir,
+    metadata,
+    index,
+    threads,
+):
+    create_folder_without_clear(Path(output_dir))
+
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_metaT_{timestamp}.log")
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    try:
+        outdir_trimmed = Path(output_dir) / "cat"
+        outdir_aligned = Path(output_dir) / "aligned_metaT"
+
+        trim_files(input_dir, outdir_trimmed, metadata, threads, "metaT")
+
+        align_files(
+            outdir_trimmed, outdir_aligned, "*metaT*.fq.gz", index, threads
+        )
+
+        logger.info("metaT finished")
+
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}", exc_info=True)
+
+@mopp.command()
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
+@click.option("-m", "--metadata", required=True, help=DESC_MD)
+@click.option("-x", "--index", required=True, help=DESC_INDEX)  
+@click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
+def metaRS(
+    input_dir,
+    output_dir,
+    metadata,
+    index,
+    threads,
+):
+    create_folder_without_clear(Path(output_dir))
+
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(f"{output_dir}/mopp_metaRS_{timestamp}.log")
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    try:
+        outdir_trimmed = Path(output_dir) / "cat"
+        outdir_aligned = Path(output_dir) / "aligned_metaRS"
+
+        trim_files(input_dir, outdir_trimmed, metadata, threads, "metaRS")
+
+        align_files(
+            outdir_trimmed, outdir_aligned, "*metaRS*.fq.gz", index, threads
+        )
+
+        logger.info("metaRS finished")
+
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}", exc_info=True)
+
 if __name__ == "__main__":
     mopp()
