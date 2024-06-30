@@ -29,7 +29,6 @@ from mopp.modules.align import align_files
 from mopp.modules.coverages import calculate_coverages
 from mopp.modules.index import genome_extraction
 from mopp.modules.features import ft_generation
-from mopp.modules.metadata import gen_metadata
 from mopp.modules.utils import create_folder_without_clear
 
 
@@ -260,25 +259,6 @@ def feature_table(rank, input_dir, output_dir, woltka_database, stratification):
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
-
-@mopp.command()
-@click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
-@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
-def generate_metadata(input_dir, output_dir):
-    create_folder_without_clear(Path(output_dir))
-
-    logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_metadatagen_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-
-    try:
-        gen_metadata(input_dir, output_dir)
-    except Exception as e:
-        logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
 if __name__ == "__main__":
     mopp()
