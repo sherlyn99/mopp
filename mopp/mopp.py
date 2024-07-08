@@ -29,7 +29,6 @@ from mopp.modules.align import align_files
 from mopp.modules.coverages import calculate_coverages
 from mopp.modules.index import genome_extraction
 from mopp.modules.features import ft_generation
-from mopp.modules.metadata import gen_metadata
 from mopp.modules.utils import create_folder_without_clear
 
 
@@ -261,27 +260,6 @@ def feature_table(rank, input_dir, output_dir, woltka_database, stratification):
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
 
-@mopp.command()
-@click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
-@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
-def generate_metadata(input_dir, output_dir):
-    create_folder_without_clear(Path(output_dir))
-
-    logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_metadatagen_{timestamp}.log")
-    filer_handler.setFormatter(formatter)
-    logger.addHandler(filer_handler)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-
-    try:
-        gen_metadata(input_dir, output_dir)
-    except Exception as e:
-        logger.error(f"An error occurred: {str(e)}", exc_info=True)
-
-
-
 
 @mopp.command()
 @click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
@@ -293,6 +271,17 @@ def generate_metadata(input_dir, output_dir):
 @click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
 @click.option("-ref", "--refdb", required=True, help=DESC_REFDB)  
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)
+@click.option(
+    "-r",
+    "--rank",
+    type=click.Choice(["species", "genus", "genus,species"]),
+    required=True,
+    help=DESC_RANK,
+)
+@click.option("-db", "--woltka_database", required=True, help=DESC_WOLTKA_DB)
+@click.option(
+    "-strat", "--stratification", is_flag=True, default=False, help=DESC_STRAT
+)
 
 def metaG(
     input_dir,
@@ -304,6 +293,9 @@ def metaG(
     cutoff,
     refdb,
     prefix,
+    rank,
+    woltka_database,
+    stratification
 ):
     create_folder_without_clear(Path(output_dir))
 
@@ -322,6 +314,9 @@ def metaG(
         outdir_cov = Path(output_dir) / "coverages"
         outdir_cov_file = Path(output_dir) / "coverages" / "coverage_percentage.txt"
         outdir_index = Path(output_dir) / "index"
+  
+        outdir_aligned_samfiles = outdir_aligned_metaG / "samfiles"
+        outdir_features = Path(output_dir) / "features"
 
 
         trim_files(input_dir, outdir_trimmed, metadata, threads, "metaG")
@@ -332,6 +327,15 @@ def metaG(
             str(outdir_aligned_metaG_samfiles), str(outdir_cov), genome_lengths
         )
         genome_extraction(outdir_cov_file, cutoff, refdb, outdir_index, prefix, threads)
+
+        rank_list = [s.strip() for s in rank.split(",")]
+        ft_generation(
+            outdir_aligned_samfiles,
+            outdir_features,
+            woltka_database,
+            rank_list,
+            stratification,
+        )
         
         logger.info("metaG finished")
 
@@ -344,12 +348,26 @@ def metaG(
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)  
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
+@click.option(
+    "-r",
+    "--rank",
+    type=click.Choice(["species", "genus", "genus,species"]),
+    required=True,
+    help=DESC_RANK,
+)
+@click.option("-db", "--woltka_database", required=True, help=DESC_WOLTKA_DB)
+@click.option(
+    "-strat", "--stratification", is_flag=True, default=False, help=DESC_STRAT
+)
 def metaT(
     input_dir,
     output_dir,
     metadata,
     index,
     threads,
+    rank,
+    woltka_database,
+    stratification
 ):
     create_folder_without_clear(Path(output_dir))
 
@@ -364,11 +382,21 @@ def metaT(
     try:
         outdir_trimmed = Path(output_dir) / "cat"
         outdir_aligned = Path(output_dir) / "aligned_metaT"
+        outdir_aligned_samfiles = outdir_aligned / "samfiles"
+        outdir_features = Path(output_dir) / "features"
 
         trim_files(input_dir, outdir_trimmed, metadata, threads, "metaT")
 
         align_files(
             outdir_trimmed, outdir_aligned, "*metaT*.fq.gz", index, threads
+        )
+        rank_list = [s.strip() for s in rank.split(",")]
+        ft_generation(
+            outdir_aligned_samfiles,
+            outdir_features,
+            woltka_database,
+            rank_list,
+            stratification,
         )
 
         logger.info("metaT finished")
@@ -382,12 +410,26 @@ def metaT(
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)  
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
+@click.option(
+    "-r",
+    "--rank",
+    type=click.Choice(["species", "genus", "genus,species"]),
+    required=True,
+    help=DESC_RANK,
+)
+@click.option("-db", "--woltka_database", required=True, help=DESC_WOLTKA_DB)
+@click.option(
+    "-strat", "--stratification", is_flag=True, default=False, help=DESC_STRAT
+)
 def metaRS(
     input_dir,
     output_dir,
     metadata,
     index,
     threads,
+    rank,
+    woltka_database,
+    stratification
 ):
     create_folder_without_clear(Path(output_dir))
 
@@ -402,11 +444,21 @@ def metaRS(
     try:
         outdir_trimmed = Path(output_dir) / "cat"
         outdir_aligned = Path(output_dir) / "aligned_metaRS"
+        outdir_aligned_samfiles = outdir_aligned / "samfiles"
+        outdir_features = Path(output_dir) / "features"
 
         trim_files(input_dir, outdir_trimmed, metadata, threads, "metaRS")
 
         align_files(
             outdir_trimmed, outdir_aligned, "*metaRS*.fq.gz", index, threads
+        )
+        rank_list = [s.strip() for s in rank.split(",")]
+        ft_generation(
+            outdir_aligned_samfiles,
+            outdir_features,
+            woltka_database,
+            rank_list,
+            stratification,
         )
 
         logger.info("metaRS finished")
