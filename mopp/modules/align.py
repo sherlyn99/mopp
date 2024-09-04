@@ -1,3 +1,4 @@
+import re
 import glob
 import lzma
 import logging
