@@ -28,7 +28,13 @@ class Test(unittest.TestCase):
                     "1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz",
                     "1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz",
                 ],
-                "identifier": ["1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2"],
+                "identifier": [
+                    "1-1_t2",
+                    "1-1_t2",
+                    "1-1_t2",
+                    "1-1_t2",
+                    "1-1_t2",
+                ],
                 "omic": ["metaRS", "metaT", "metaT", "metaG", "metaG"],
                 "strand": ["R1", "R2", "R1", "R2", "R1"],
             }
@@ -43,7 +49,13 @@ class Test(unittest.TestCase):
                     "1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz",
                     "1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz",
                 ],
-                "identifier": ["1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2"],
+                "identifier": [
+                    "1-1_t2",
+                    "1-1_t2",
+                    "1-1_t2",
+                    "1-1_t2",
+                    "1-1_t2",
+                ],
                 "omic": ["metaRS", "metaT", "metaT", "metaG", "metaG"],
                 "strand": ["R1", "R2", "R1", "R2", "R1"],
                 "label": [
@@ -68,7 +80,13 @@ class Test(unittest.TestCase):
                     "1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz",
                     "1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz",
                 ],
-                "identifier": ["1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2", "1-1_t2"],
+                "identifier": [
+                    "1-1_t2",
+                    "1-1_t2",
+                    "1-1_t2",
+                    "1-1_t2",
+                    "1-1_t2",
+                ],
                 "omic": ["metaRS", "metaT", "metaT", "metaG", "metaG"],
             }
         )
@@ -101,7 +119,11 @@ class Test(unittest.TestCase):
                 "metaT": ["sample2_R1", "sample2_R2"],
                 "metaRS": [-1],
             },
-            "id3": {"metaG": [-1, -1], "metaT": [-1, -1], "metaRS": ["sample3"]},
+            "id3": {
+                "metaG": [-1, -1],
+                "metaT": [-1, -1],
+                "metaRS": ["sample3"],
+            },
         }
         actual_dict = _md_to_dict(test_md_df)
         self.assertEqual(expected_dict, actual_dict)
@@ -155,7 +177,9 @@ class Test(unittest.TestCase):
         expected_gotu_filtered = pd.Series(["genome3", "genome1"], name="gotu")
 
         # Actual results
-        actual_cov_filtered, actual_gotu_filtered = _cov_filter(cov_file, cutoff_value)
+        actual_cov_filtered, actual_gotu_filtered = _cov_filter(
+            cov_file, cutoff_value
+        )
 
         # Reset indices before comparison
         expected_cov_filtered.reset_index(drop=True, inplace=True)
@@ -164,8 +188,12 @@ class Test(unittest.TestCase):
         actual_gotu_filtered.reset_index(drop=True, inplace=True)
 
         # Comparison
-        pd.testing.assert_frame_equal(expected_cov_filtered, actual_cov_filtered)
-        pd.testing.assert_series_equal(expected_gotu_filtered, actual_gotu_filtered)
+        pd.testing.assert_frame_equal(
+            expected_cov_filtered, actual_cov_filtered
+        )
+        pd.testing.assert_series_equal(
+            expected_gotu_filtered, actual_gotu_filtered
+        )
 
     def test_commands_generation_bt2build(self):
         output_fna_file = "/path/to/genomes.fna"
@@ -215,7 +243,9 @@ class Test(unittest.TestCase):
         indir = "/path/to/indir"
         outdir = "/path/to/outdir"
         db = "/path/to/db"
-        commands = _commands_stratification_generation_woltka(rank, indir, outdir, db)
+        commands = _commands_stratification_generation_woltka(
+            rank, indir, outdir, db
+        )
         expected_commands = [
             "woltka",
             "classify",

@@ -30,12 +30,16 @@ def _validate_metadata(md_df):
     """
     # check number of columns
     if md_df.shape[1] != 4:
-        err = "Check metadata and make sure it has 4 columns like the template."
+        err = (
+            "Check metadata and make sure it has 4 columns like the template."
+        )
         logger.error(err)
         raise ValueError(err)
 
     # check uniqueness of identifier+omic+strand
-    md_df["label"] = md_df["identifier"] + "|" + md_df["omic"] + "|" + md_df["strand"]
+    md_df["label"] = (
+        md_df["identifier"] + "|" + md_df["omic"] + "|" + md_df["strand"]
+    )
     duplicates = md_df["label"].duplicated()
     if duplicates.any():
         err = f'Duplicate entries of identifier+omic+strand found: {md_df[duplicates]["label"].tolist()}'
@@ -55,7 +59,11 @@ def _md_to_dict(md_df):
             row["strand"],
         )
         if identifier not in md_dict:
-            md_dict[identifier] = {"metaG": [-1, -1], "metaT": [-1, -1], "metaRS": [-1]}
+            md_dict[identifier] = {
+                "metaG": [-1, -1],
+                "metaT": [-1, -1],
+                "metaRS": [-1],
+            }
             # md_dict[identifier] = {"metaRS": [-1]}
         if strand == "r1":
             md_dict[identifier][omic][0] = sample_name

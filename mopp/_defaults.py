@@ -39,9 +39,7 @@ DESC_MD = "Sample metadata file in tsv format. See README for a template."
 DESC_INPUT = "Input: Directory of metaG/metaT/metaRS files."
 DESC_INPUT_SAM = "Input: Directory of metaG/metaT/metaRS samfiles."
 DESC_INPUT_TRIMMED = "Input: Directory of metaG/metaT/metaRS trimmed files."
-DESC_OUTPUT = (
-    "Output: Output directory. Must be a new directory that currently does not exist."
-)
+DESC_OUTPUT = "Output: Output directory. Must be a new directory that currently does not exist."
 DESC_INDEX = "Genome index."
 DESC_NTHREADS = "Number of threads. [default: 4]."
 # module: align
@@ -49,12 +47,16 @@ DESC_PATTERN = "File patterns to include for alignment."
 DESC_COMPRESS_SAM = "If yes, samfiles generated will be compressed."
 # module: features
 DESC_RANK = "Taxonomic rank."
-DESC_STRAT = "Enables uniref stratification. Applies to all ranks. Default: off"
+DESC_STRAT = (
+    "Enables uniref stratification. Applies to all ranks. Default: off"
+)
 DESC_WOLTKA_DB = "Path to woltka database."
 
 # module: index
 DESC_GENOME_LENGTHS = "Path to a file with genome lengths."
-DESC_CUTOFF = "The genome coverage cutoff threshold for generating the subset index."
+DESC_CUTOFF = (
+    "The genome coverage cutoff threshold for generating the subset index."
+)
 DESC_REFDB = "Path to the reference database file (.fna, .fna.gz, .fna.xz)."
 DESC_PREFIX = "Prefix for generated files."
 DESC_INPUT_COV = "Path to the coverage file in tab-separated format."
