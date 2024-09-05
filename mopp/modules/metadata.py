@@ -14,7 +14,7 @@ def load_metadata(md_path):
 
 
 def _md_to_df(md_path):
-    """Load metadata."""
+    """Load metadata"""
     md_df = pd.read_csv(md_path, sep="\t", low_memory=False)
     md_df["sample_name"] = md_df["sample_name"].str.strip()
     md_df["identifier"] = md_df["identifier"].str.strip()
@@ -27,6 +27,7 @@ def _validate_metadata(md_df):
     Validate metadata:
     (1) ncols = 4
     (2) identifier+omic+strand is unique
+    Does NOT verify if all identifiers have all omics and strands
     """
     # check number of columns
     if md_df.shape[1] != 4:
@@ -49,7 +50,7 @@ def _validate_metadata(md_df):
 
 
 def _md_to_dict(md_df):
-    """Stores metadata in a dictionary."""
+    """Stores metadata in a dictionary"""
     md_dict = {}
     for _, row in md_df.iterrows():
         sample_name, identifier, omic, strand = (
@@ -59,15 +60,15 @@ def _md_to_dict(md_df):
             row["strand"],
         )
         if identifier not in md_dict:
-            md_dict[identifier] = {
-                "metaG": [-1, -1],
-                "metaT": [-1, -1],
-                "metaRS": [-1],
-            }
-            # md_dict[identifier] = {"metaRS": [-1]}
+            md_dict[identifier] = {}
+        if omic not in md_dict[identifier]:
+            if omic == "metaRS":
+                md_dict[identifier][omic] = [-1]
+            else:
+                md_dict[identifier][omic] = [-1, -1]
         if strand == "r1":
             md_dict[identifier][omic][0] = sample_name
-        elif strand == "r2":
+        elif strand == "r2" and omic != "metaRS":
             md_dict[identifier][omic][1] = sample_name
     logger.info("Metadata loaded")
     return md_dict
