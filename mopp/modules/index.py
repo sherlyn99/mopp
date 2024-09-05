@@ -11,7 +11,12 @@ logger = logging.getLogger("mopp")
 
 
 def genome_extraction(
-    cov: str, cutoff: float, refdb: str, outdir: str, prefix: str, nthreads: int
+    cov: str,
+    cutoff: float,
+    refdb: str,
+    outdir: str,
+    prefix: str,
+    nthreads: int,
 ):
     """
     Only used for metagenomic data. Takes in a coverages.tsv, a cutoff, an outdir,
@@ -53,13 +58,18 @@ def _cov_filter(cov: str, cutoff: float):
     """
     cov = pd.read_csv(cov, sep="\t")
     cov_filtered = cov.loc[cov["percent_covered"] >= cutoff]
-    cov_filtered = cov_filtered.sort_values(by="percent_covered", ascending=False)
+    cov_filtered = cov_filtered.sort_values(
+        by="percent_covered", ascending=False
+    )
     gotu_filtered = cov_filtered["genome_id"]
     return cov_filtered, gotu_filtered
 
 
 def _cov_filter_write(
-    cov_filtered: pd.DataFrame, gotu_filtered: pd.DataFrame, outdir: str, prefix: str
+    cov_filtered: pd.DataFrame,
+    gotu_filtered: pd.DataFrame,
+    outdir: str,
+    prefix: str,
 ):
     """
     Generate files based on filtered genome information.
@@ -158,7 +168,9 @@ def _build_db(output_fna_file: str, outdir: str, prefix: str, nthreads: int):
         output_fna_file, output_bt2index, prefix, nthreads
     )
     logger.info(f"{prefix} indexdb creation started")
-    p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(
+        commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     output, error = p.communicate()
     if p.returncode != 0:
         err = f"{prefix} indexdb failed with code {p.returncode} and error {error.decode('utf-8')}"

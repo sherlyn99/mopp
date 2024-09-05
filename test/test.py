@@ -9,11 +9,13 @@ import pandas as pd
 from pandas.testing import assert_frame_equal
 
 import unittest
-#from mopp._defaults import (DESC_MD, DESC_INPUT)
+
+# from mopp._defaults import (DESC_MD, DESC_INPUT)
 from mopp.modules import trim
 from mopp.modules import align
-from mopp.modules import (load_metadata, md_to_dict, validate_metadata)
+from mopp.modules import load_metadata, md_to_dict, validate_metadata
 import logging
+
 
 def tearDown(dir):
     # Clean up the temporary directory and its contents
@@ -23,14 +25,22 @@ def tearDown(dir):
             os.remove(file_path)
 
 
-
 class Test(unittest.TestCase):
 
     def test_align_files(self):
-        test_dict =  md_to_dict(load_metadata('./test/data/metadata.tsv'))
+        test_dict = md_to_dict(load_metadata("./test/data/metadata.tsv"))
 
-        trim.trim_files("./test/data","./test/out", md_to_dict(load_metadata("./test/data/metadata.tsv")))
-        align.align_files("./test/out/trimmed", "./test/out",test_dict,'./wol_subset_index/wol_subset0.1_index')
+        trim.trim_files(
+            "./test/data",
+            "./test/out",
+            md_to_dict(load_metadata("./test/data/metadata.tsv")),
+        )
+        align.align_files(
+            "./test/out/trimmed",
+            "./test/out",
+            test_dict,
+            "./wol_subset_index/wol_subset0.1_index",
+        )
 
         manual_metag_bow = "./test/data/out_manual/aligned/1-1_t2_metaG_cat_trimmed_WoL_subset.bow"
         manual_metag_sam = "./test/data/out_manual/aligned/1-1_t2_metaG_cat_trimmed_WoL_subset.sam"
@@ -41,15 +51,26 @@ class Test(unittest.TestCase):
         manual_metars_bow = "./test/data/out_manual/aligned/1-1_t2_metaRS_cat_trimmed_WoL_subset.bow"
         manual_metars_sam = "./test/data/out_manual/aligned/1-1_t2_metaRS_cat_trimmed_WoL_subset.sam"
 
+        test_metag_bow = (
+            "./test/out/aligned/1-1_t2_metaG_cat_trimmed_WoL_subset.bow"
+        )
+        test_metag_sam = (
+            "../test/out/aligned/1-1_t2_metaG_cat_trimmed_WoL_subset.sam"
+        )
 
-        test_metag_bow = "./test/out/aligned/1-1_t2_metaG_cat_trimmed_WoL_subset.bow"
-        test_metag_sam = "../test/out/aligned/1-1_t2_metaG_cat_trimmed_WoL_subset.sam"
+        test_metat_bow = (
+            "./test/out/aligned/1-1_t2_metaT_cat_trimmed_WoL_subset.bow"
+        )
+        test_metat_sam = (
+            "./test/out/aligned/1-1_t2_metaT_cat_trimmed_WoL_subset.sam"
+        )
 
-        test_metat_bow = "./test/out/aligned/1-1_t2_metaT_cat_trimmed_WoL_subset.bow"
-        test_metat_sam = "./test/out/aligned/1-1_t2_metaT_cat_trimmed_WoL_subset.sam"
-
-        test_metars_bow = "./test/out/aligned/1-1_t2_metaRS_cat_trimmed_WoL_subset.bow"
-        test_metars_sam = "./test/out/aligned/1-1_t2_metaRS_cat_trimmed_WoL_subset.sam"
+        test_metars_bow = (
+            "./test/out/aligned/1-1_t2_metaRS_cat_trimmed_WoL_subset.bow"
+        )
+        test_metars_sam = (
+            "./test/out/aligned/1-1_t2_metaRS_cat_trimmed_WoL_subset.sam"
+        )
 
         self.assertEqual(manual_metag_bow, test_metag_bow)
         self.assertEqual(manual_metag_sam, test_metag_sam)
@@ -60,25 +81,30 @@ class Test(unittest.TestCase):
         self.assertEqual(manual_metars_bow, test_metars_bow)
         self.assertEqual(manual_metars_sam, test_metars_sam)
 
-
-
     def test_run_align(self):
-        test_dict =  md_to_dict(load_metadata('./test/data/metadata.tsv'))
-        trim._run_trim_paired("./test/data/1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz", "./test/data/1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz", "./test/out")
-        trim._concat_paired('./test/out', test_dict)
-        align._run_align("./test/out/1-1_t2_metaG_cat_trimmed.fq.gz", './test/out/', './wol_subset_index/wol_subset0.1_index')
+        test_dict = md_to_dict(load_metadata("./test/data/metadata.tsv"))
+        trim._run_trim_paired(
+            "./test/data/1-1_t2_metaG_S121_L004_R1_001.250k.fastq.gz",
+            "./test/data/1-1_t2_metaG_S121_L004_R2_001.250k.fastq.gz",
+            "./test/out",
+        )
+        trim._concat_paired("./test/out", test_dict)
+        align._run_align(
+            "./test/out/1-1_t2_metaG_cat_trimmed.fq.gz",
+            "./test/out/",
+            "./wol_subset_index/wol_subset0.1_index",
+        )
 
         test_bow = "./test/out/1-1_t2_metaG_cat_trimmed_WoL_subset.bow"
         test_sam = "./test/out/1-1_t2_metaG_cat_trimmed_WoL_subset.sam"
 
         manual_alignment_bow = "./test/data/out_manual/aligned/1-1_t2_metaG_cat_trimmed_WoL_subset.bow"
         manual_alignment_sam = "./test/data/out_manual/aligned/1-1_t2_metaG_cat_trimmed_WoL_subset.sam"
-        
+
         self.assertEqual(test_bow, manual_alignment_bow)
         self.assertEqual(test_sam, manual_alignment_sam)
 
         tearDown("./test/out")
-
 
     ### METADATA FUNCTIONS
     """
@@ -260,6 +286,7 @@ class Test(unittest.TestCase):
     ### TRIM FUNCTIONS END
 """
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     tearDown("./test/out")
     unittest.main()
