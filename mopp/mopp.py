@@ -34,7 +34,9 @@ from mopp.modules.utils import create_folder_without_clear
 
 logger = logging.getLogger("mopp")
 timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+formatter = logging.Formatter(
+    "%(asctime)s-%(name)s-%(levelname)s: %(message)s"
+)
 
 
 @click.group(help=MSG_WELCOME)
