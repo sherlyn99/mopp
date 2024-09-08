@@ -33,13 +33,29 @@ The workflow takes the following steps:
 [Insert paper citation here]
 
 """
+MSG_WELCOME_METADATA = """
+This module is for creating and/or validating metadata. If the input is a directory, 
+MOPP is going to search for all files end in '.fastq.gz' or 'fq.gz' and then auto-generate a 
+metadata based on the results of the search and the auto-generated metadata will be 
+validated. If an output path to a new metadata file is not created, the metadata 
+and log will be created in the input directory. 
+
+If the input is a path to the metadata file, MOPP will validate it. 
+By default, MOPP checks if the metadata is in the correct format. If '-paired' is specified, 
+MOPP will check if all metaG/metaT data has both R1 and R2. If '-multiomics' is specified, 
+MOPP will check if all samples have metaG, metaT, and metaRS.
+"""
 
 # descriptions
 DESC_MD = "Sample metadata file in tsv format. See README for a template."
+DESC_MD_OR_DIR = "Sample metadata file in tsv format (See README for a template) or a directory containing rawdata end in '.fastq.gz' or 'fq.gz'."
+DESC_MD_OUTPUT = "Output path to a new metadata file."
 DESC_INPUT = "Input: Directory of metaG/metaT/metaRS files."
 DESC_INPUT_SAM = "Input: Directory of metaG/metaT/metaRS samfiles."
 DESC_INPUT_TRIMMED = "Input: Directory of metaG/metaT/metaRS trimmed files."
 DESC_OUTPUT = "Output: Output directory. Must be a new directory that currently does not exist."
+DESC_VALIDATE_PAIRED_END = "Enable metadata validation for paired-end data."
+DESC_VALIDATE_MULTIOMICS = "Enable metadata validation for multiomics data"
 DESC_INDEX = "Genome index."
 DESC_NTHREADS = "Number of threads. [default: 4]."
 # module: align

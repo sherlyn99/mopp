@@ -1,21 +1,55 @@
 import sys
 import logging
 import pandas as pd
-from collections import defaultdict
+from glob import glob
+
 
 logger = logging.getLogger("mopp")
 
 
-def load_metadata(md_path):
-    md_df = _md_to_df(md_path)
+def autogenerate_metadata(indir):
+    """Auto-generate the metadata without valdating it"""
+    file_list = list(
+        set(glob(indir + "/*.fastq.gz") + glob(indir + "/*.fq.gz"))
+    )
+    md = pd.DataFrame({"sample_name": file_list})
+    filenames = md["sample_name"].astype(str).str.split("/").str[-1]
+    filenames_nosuffix = filenames.str.split(".fastq.gz|.fq.gz").str[0]
+    md["identifier"] = filenames_nosuffix.str.split("_meta|_R").str[0]
+    md["omic"] = (
+        "meta"
+        + filenames_nosuffix.str.split("_meta|_R").str[1].str.split("_").str[0]
+    )
+    md["strand"] = (
+        "R"
+        + filenames_nosuffix.str.split("_meta|_R").str[2].str.split("_").str[0]
+    )
+    return md
+
+
+def validate_metadata(md_df, paired=False, multiomics=False):
+    _validate_md(md_df, paired, multiomics)
+
+
+def load_metadata_to_df_with_validation(
+    md_path, paired=False, multiomics=False
+):
+    md_df = _md_to_df(md_path, paired, multiomics)
+    return md_df
+
+
+def load_metadata_to_dict_with_validation(
+    md_path, paired=False, multiomics=False
+):
+    md_df = _md_to_df(md_path, paired, multiomics)
     md_dict = _df_to_dict(md_df)
     return md_dict
 
 
-def _md_to_df(md_path):
-    """Load metadata into a pandas dataframe"""
+def _md_to_df(md_path, paired=False, multiomics=False):
+    """Load metadata into a pandas dataframe and validate it"""
     md_df = pd.read_csv(md_path, sep="\t", low_memory=False)
-    _validate_md(md_df)
+    _validate_md(md_df, paired, multiomics)
 
     md_df["sample_name"] = md_df["sample_name"].str.strip()
     md_df["identifier"] = md_df["identifier"].str.strip()
@@ -69,38 +103,53 @@ def _validate_md(md_df, paired=False, multiomics=False):
 
     # check if all R1's of metaG/metaT data has a corresponding R2
     if paired:
-        _valid_paired_end(md_df)
+        _validate_paired_end(md_df)
 
     # check if all identifiers have metaG, metaT, and metaRS
     if multiomics:
-        _valid_multiomics(md_df)
+        _validate_multiomics(md_df)
 
 
-def _valid_paired_end(md_df):
-    """Need to work on this"""
-    paired_dict = {}
-    for _, row in md_df.iterrows():
-        if row["omic"] != "metaRS":
-            curr_key = row["identifier"] + "|" + row["omic"]
-            if curr_key not in paired_dict:
-                paired_dict[curr_key] = [-1, -1]
-    for key, val in paired_dict:
-        if -1 in val:
-            err = f"{key} is missing a paired-end file."
-            sys.exit(1)
+def _validate_paired_end(md_df):
+    """For any omics other than metaRS, check if the same identifier + omic
+    group has both r1 and r2"""
+    df = md_df[md_df["omic"] != "metaRS"]
+    grouped = df.groupby(["identifier", "omic"])["strand"].apply(
+        lambda x: set(x)
+    )
+    invalid_groups = grouped[grouped.apply(lambda x: x != {"r1", "r2"})]
+    if not invalid_groups.empty:
+        err = (
+            f"Missing a strand for the following identifier + omic groups: "
+            + "; ".join(
+                [
+                    f"{identifier}_{omic}"
+                    for (identifier, omic), strands in invalid_groups.items()
+                ]
+            )
+        )
+        logger.error(err)
+        sys.exit(1)
 
 
-def _valid_multiomics(md_df):
-    """Need to work on this"""
-    multiomics_dict = {}
-    for _, row in md_df.iterrows():
-        curr_key = row["identifier"]
-        if curr_key not in multiomics_dict:
-            multiomics_dict[curr_key] = [-1, -1, -1]
-    for key, val in multiomics_dict:
-        if -1 in val:
-            err = f"{key} is missing a paired-end file."
-            sys.exit(1)
+def _validate_multiomics(md_df):
+    """For all identifier, check if it has metaG, metaT, and metaRS"""
+    grouped = md_df.groupby(["identifier"])["omic"].apply(lambda x: set(x))
+    invalid_groups = grouped[
+        grouped.apply(lambda x: x != {"metaG", "metaRS", "metaT"})
+    ]
+    if not invalid_groups.empty:
+        err = (
+            f"Missing at least one omic for the following identifiers: "
+            + "; ".join(
+                [
+                    f"{identifier}"
+                    for identifier, omics in invalid_groups.items()
+                ]
+            )
+        )
+        logger.error(err)
+        sys.exit(1)
 
 
 def _df_to_dict(md_df):
@@ -124,9 +173,5 @@ def _df_to_dict(md_df):
             md_dict[identifier][omic][0] = sample_name
         elif strand == "r2" and omic != "metaRS":
             md_dict[identifier][omic][1] = sample_name
-    logger.info("Metadata loaded")
+    logger.info("Metadata loaded into a dictionary")
     return md_dict
-
-
-if __name__ == "__main__":
-    load_metadata()

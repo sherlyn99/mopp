@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 from mopp.modules.utils import create_folder_without_clear
 from mopp.modules.utils import pool_processes
-from mopp.modules.metadata import load_metadata
+from mopp.modules.metadata import load_metadata_to_dict_with_validation
 from multiprocessing import Pool
 
 logger = logging.getLogger("mopp")
@@ -31,7 +31,7 @@ def cat_paired(args):
 
 def trim_files(indir, outdir, md_path, threads):
     # load metadata into md_dict
-    md_dict = load_metadata(md_path)
+    md_dict = load_metadata_to_dict_with_validation(md_path)
 
     # create ./trimmed
     # if outdir already existed, will clear content
