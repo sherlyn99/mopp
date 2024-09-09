@@ -1,10 +1,10 @@
 import logging
 import subprocess
 from pathlib import Path
-from mopp.modules.utils import create_folder_without_clear
 from mopp.modules.utils import pool_processes
+from mopp.modules.utils import create_folder_without_clear
 from mopp.modules.metadata import load_metadata_to_dict_with_validation
-from multiprocessing import Pool
+
 
 logger = logging.getLogger("mopp")
 
@@ -33,8 +33,7 @@ def trim_files(indir, outdir, md_path, threads):
     # load metadata into md_dict
     md_dict = load_metadata_to_dict_with_validation(md_path)
 
-    # create ./trimmed
-    # if outdir already existed, will clear content
+    # create ./trimmed, if outdir already existed, will not clear content, might overwrite
     outdir_cat = Path(outdir)
     outdir_trimmed = Path(outdir_cat) / "trimmed_reports"
     create_folder_without_clear(outdir_cat)
@@ -144,6 +143,7 @@ def _run_trim_metars(r1_file, outdir):
 
 
 def _cat_paired(indir, outdir, identifier, omic, stem):
+    stem = stem.split("R2")[0]
     commands = [
         f"cat {indir}/{stem}*.fq.gz > {outdir}/{identifier}_{omic}_trimmed.fq.gz"
     ]

@@ -165,6 +165,7 @@ def _df_to_dict(md_df):
             row["omic"],
             row["strand"],
         )
+
         if identifier not in md_dict:
             md_dict[identifier] = {}
         if omic not in md_dict[identifier]:
