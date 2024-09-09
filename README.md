@@ -18,22 +18,26 @@ The culmination of the pipelines is the creation of a feature count table using 
 
 Different use cases may have more requirements, but for every use case, the following are necessary:
 1. An input folder with your sequencing data
-2. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/test/data/metadata.tsv). Please avoid . in naming files unless . is used before suffix.
+2. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/test/data/metadata.tsv). Please avoid . in naming files unless . is used before suffix. Please avoid _Rxx in namig files unless it is for indicating strand (e.g. _R1, _R2). If any data is not meant to be paired, just put 'R1' in the strand column.
 
 
 ***
 <h2> <p align ="center"> Installation </p> </h2>
 
+MOPP works with python >= 3.8 and linux-based web servers. 
 To install mopp using pip, run the following command
 ```
+conda create -n mopp python=3.8
+conda activate mopp
+conda install -c conda-forge -c bioconda bowtie2 trim-galore woltka
 pip3 install mopp
 ```
 
-To install the most up to date version of mopp, run the following command
+To install the most up-to-date version of mopp, run the following command
 ```
 git clone https://github.com/sherlyn99/mopp.git
 cd mopp
-conda env create -f mopp.yml
+conda env create -f mopp.yml -n mopp
 conda activate mopp
 pip install -e .
 ```
@@ -41,7 +45,7 @@ or use mamba for faster installation
 ```
 git clone https://github.com/sherlyn99/mopp.git
 cd mopp
-conda install mamba -n base -c conda-forge
+conda install mamba -n base -c conda-forge # skip if mamba is already installed
 mamba env create -f mopp.yml
 mamba activate mopp
 pip install -e .

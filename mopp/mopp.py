@@ -83,7 +83,9 @@ def workflow(
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
+    filer_handler = logging.FileHandler(
+        f"{output_dir}/mopp_workflow_{timestamp}.log"
+    )
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -97,21 +99,33 @@ def workflow(
         outdir_aligned = Path(output_dir) / "aligned"
         outdir_aligned_samfiles = outdir_aligned / "samfiles"
         outdir_cov = Path(output_dir) / "coverages"
-        outdir_cov_file = Path(output_dir) / "coverages" / "coverage_percentage.txt"
+        outdir_cov_file = (
+            Path(output_dir) / "coverages" / "coverage_percentage.txt"
+        )
         outdir_index = Path(output_dir) / "index"
         outdir_index_path = outdir_index / f"{prefix}_bt2index" / prefix
         outdir_features = Path(output_dir) / "features"
 
         trim_files(input_dir, outdir_trimmed, metadata, threads)
         align_files(
-            outdir_trimmed, outdir_aligned_metaG, "*metaG*.fq.gz", index, threads
+            outdir_trimmed,
+            outdir_aligned_metaG,
+            "*metaG*.fq.gz",
+            index,
+            threads,
         )
         calculate_coverages(
             str(outdir_aligned_metaG_samfiles), str(outdir_cov), genome_lengths
         )
-        genome_extraction(outdir_cov_file, cutoff, refdb, outdir_index, prefix, threads)
+        genome_extraction(
+            outdir_cov_file, cutoff, refdb, outdir_index, prefix, threads
+        )
         align_files(
-            outdir_trimmed, outdir_aligned, "*.fq.gz", str(outdir_index_path), threads
+            outdir_trimmed,
+            outdir_aligned,
+            "*.fq.gz",
+            str(outdir_index_path),
+            threads,
         )
         rank_list = [s.strip() for s in rank.split(",")]
         ft_generation(
@@ -136,7 +150,9 @@ def trim(input_dir, output_dir, metadata, threads):
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
+    filer_handler = logging.FileHandler(
+        f"{output_dir}/mopp_workflow_{timestamp}.log"
+    )
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -160,7 +176,9 @@ def align(input_dir, output_dir, pattern, index, threads, compress_samfiles):
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_align_{timestamp}.log")
+    filer_handler = logging.FileHandler(
+        f"{output_dir}/mopp_align_{timestamp}.log"
+    )
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -169,7 +187,12 @@ def align(input_dir, output_dir, pattern, index, threads, compress_samfiles):
 
     try:
         align_files(
-            input_dir, output_dir, pattern, index, threads, compress=compress_samfiles
+            input_dir,
+            output_dir,
+            pattern,
+            index,
+            threads,
+            compress=compress_samfiles,
         )
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
@@ -185,7 +208,9 @@ def cov(input_dir, output_dir, genome_lengths):
     create_folder_without_clear(output_dir)
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
+    filer_handler = logging.FileHandler(
+        f"{output_dir}/mopp_workflow_{timestamp}.log"
+    )
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -212,7 +237,9 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
+    filer_handler = logging.FileHandler(
+        f"{output_dir}/mopp_workflow_{timestamp}.log"
+    )
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -220,7 +247,9 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
     logger.addHandler(stream_handler)
 
     try:
-        genome_extraction(input_cov, cutoff, refdb, output_dir, prefix, threads)
+        genome_extraction(
+            input_cov, cutoff, refdb, output_dir, prefix, threads
+        )
 
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
@@ -240,11 +269,15 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
 @click.option(
     "-strat", "--stratification", is_flag=True, default=False, help=DESC_STRAT
 )
-def feature_table(rank, input_dir, output_dir, woltka_database, stratification):
+def feature_table(
+    rank, input_dir, output_dir, woltka_database, stratification
+):
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
-    filer_handler = logging.FileHandler(f"{output_dir}/mopp_workflow_{timestamp}.log")
+    filer_handler = logging.FileHandler(
+        f"{output_dir}/mopp_workflow_{timestamp}.log"
+    )
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
     stream_handler = logging.StreamHandler()
@@ -254,7 +287,9 @@ def feature_table(rank, input_dir, output_dir, woltka_database, stratification):
     rank_list = [s.strip() for s in rank.split(",")]
 
     try:
-        ft_generation(input_dir, output_dir, woltka_database, rank_list, stratification)
+        ft_generation(
+            input_dir, output_dir, woltka_database, rank_list, stratification
+        )
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 

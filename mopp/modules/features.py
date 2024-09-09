@@ -14,7 +14,9 @@ def ft_generation(indir, outdir, db, rank: list, stratification):
         message = "genus level feature table generation"
         commands = _commands_generation_woltka("genus", indir, outdir, db)
         logger.info(f"{message} started")
-        p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         output, error = p.communicate()
         if p.returncode != 0:
             logger.error(
@@ -44,7 +46,9 @@ def ft_generation(indir, outdir, db, rank: list, stratification):
         message = "species level feature table generation"
         commands = _commands_generation_woltka("species", indir, outdir, db)
         logger.info(f"{message} started")
-        p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         output, error = p.communicate()
         if p.returncode != 0:
             logger.error(

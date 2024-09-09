@@ -65,11 +65,17 @@ def trim_files(indir, outdir, md_path, threads):
 
     pool_processes(
         threads,
-        [[run_trim_metars, arg_list_metars], [run_trim_paired, arg_list_trimpaired]],
+        [
+            [run_trim_metars, arg_list_metars],
+            [run_trim_paired, arg_list_trimpaired],
+        ],
     )
     pool_processes(
         threads,
-        [[rename_files, arg_list_renamefiles], [cat_paired, arg_list_catpaired]],
+        [
+            [rename_files, arg_list_renamefiles],
+            [cat_paired, arg_list_catpaired],
+        ],
     )
 
 
@@ -101,7 +107,9 @@ def _run_trim_paired(r1_file, r2_file, outdir):
         "--fastqc",
     ]
     logger.info(f"{r1_file.name} & R2 trimming started")
-    p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(
+        commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     output, error = p.communicate()
     if p.returncode != 0:
         err = f"{r1_file.name} & R2 trimming failed with code {p.returncode} and error {error.decode('utf-8')}"
@@ -123,7 +131,9 @@ def _run_trim_metars(r1_file, outdir):
         "--fastqc",
     ]
     logger.info(f"{r1_file.name} trimming started")
-    p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(
+        commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     output, error = p.communicate()
     if p.returncode != 0:
         logger.error(

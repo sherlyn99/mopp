@@ -34,7 +34,9 @@ def _run_align(filepath, suffix, outdir, INDEX, nthreads, compress=True):
         filepath, identifier, suffix, outdir, INDEX, nthreads
     )
     logger.info(f"{Path(filepath).name} alignment started")
-    p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(
+        commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     output, error = p.communicate()
     if p.returncode != 0:
         err = f"{Path(filepath).name} alignment failed with code {p.returncode} and error {error.decode('utf-8')}"
@@ -43,8 +45,12 @@ def _run_align(filepath, suffix, outdir, INDEX, nthreads, compress=True):
         logger.info(f"{Path(filepath).name} alignment finished")
 
     if compress:
-        file_to_compress = Path(outdir) / "samfiles" / f"{identifier}_{suffix}.sam"
-        file_compressed = Path(outdir) / "samfiles" / f"{identifier}_{suffix}.sam.xz"
+        file_to_compress = (
+            Path(outdir) / "samfiles" / f"{identifier}_{suffix}.sam"
+        )
+        file_compressed = (
+            Path(outdir) / "samfiles" / f"{identifier}_{suffix}.sam.xz"
+        )
 
         with open(file_to_compress, "rb") as input_file, lzma.open(
             file_compressed, "wb"
@@ -54,7 +60,9 @@ def _run_align(filepath, suffix, outdir, INDEX, nthreads, compress=True):
         logger.info(f"{Path(filepath).name} samfile zipped.")
 
 
-def _commands_generation_bowtie2(filepath, identifier, suffix, outdir, INDEX, nthreads):
+def _commands_generation_bowtie2(
+    filepath, identifier, suffix, outdir, INDEX, nthreads
+):
     commands = [
         "bowtie2",
         "-U",
