@@ -168,13 +168,10 @@ def _df_to_dict(md_df):
         if identifier not in md_dict:
             md_dict[identifier] = {}
         if omic not in md_dict[identifier]:
-            if omic == "metaRS":
-                md_dict[identifier][omic] = [-1]
-            else:
-                md_dict[identifier][omic] = [-1, -1]
+            md_dict[identifier][omic] = [-1]
         if strand == "r1":
             md_dict[identifier][omic][0] = sample_name
         elif strand == "r2" and omic != "metaRS":
-            md_dict[identifier][omic][1] = sample_name
+            md_dict[identifier][omic].append(sample_name)
     logger.info("Metadata loaded into a dictionary")
     return md_dict

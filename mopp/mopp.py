@@ -173,7 +173,7 @@ def workflow(
 )
 def metadata(input, outpath, paired_end, multiomics):
     if Path(input).is_dir():
-        # creating and validating metadata
+        # create and validate metadata
         if outpath:
             output_dir = Path(outpath).parents[0]
             output_path = Path(outpath)
@@ -181,7 +181,7 @@ def metadata(input, outpath, paired_end, multiomics):
             output_dir = Path(input)  # for log files
             output_path = Path(input) / "metadata_auto.tsv"
     else:
-        # just validating metadata, not output metadata
+        # just validate metadata, no output
         output_dir = Path(input).parents[0]  # for log files
 
     create_folder_without_clear(output_dir)
@@ -197,7 +197,7 @@ def metadata(input, outpath, paired_end, multiomics):
     logger.addHandler(stream_handler)
 
     if Path(input).is_dir():
-        # create metadata and validate
+        # create and validate metadata
         logger.info("Input directory detected. Auto-generating metadata...")
         md_df = autogenerate_metadata(input)
 
@@ -209,7 +209,7 @@ def metadata(input, outpath, paired_end, multiomics):
         md_df.to_csv(output_path, sep="\t", index=False, header=True)
         logger.info(f"Metadata written to {output_path}.")
     else:
-        # just validating metadata
+        # just validate metadata
         md_df = load_metadata_to_df_with_validation(
             input, paired_end, multiomics
         )
