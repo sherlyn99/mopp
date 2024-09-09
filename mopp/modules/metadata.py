@@ -1,6 +1,7 @@
 import sys
 import logging
 import pandas as pd
+from pathlib import Path
 from glob import glob
 
 
@@ -12,6 +13,8 @@ def autogenerate_metadata(indir):
     file_list = list(
         set(glob(indir + "/*.fastq.gz") + glob(indir + "/*.fq.gz"))
     )
+    file_list = [str(Path(file).name) for file in file_list]
+
     md = pd.DataFrame({"sample_name": file_list})
     filenames = md["sample_name"].astype(str).str.split("/").str[-1]
     filenames_nosuffix = filenames.str.split(".fastq.gz|.fq.gz").str[0]
@@ -21,7 +24,7 @@ def autogenerate_metadata(indir):
         + filenames_nosuffix.str.split("_meta|_R").str[1].str.split("_").str[0]
     )
     md["strand"] = (
-        "R"
+        "r"
         + filenames_nosuffix.str.split("_meta|_R").str[2].str.split("_").str[0]
     )
     return md

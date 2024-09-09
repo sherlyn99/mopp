@@ -161,14 +161,14 @@ def workflow(
     "-p",
     "--paired-end",
     is_flag=True,
-    default=True,
+    default=False,
     help=DESC_VALIDATE_PAIRED_END,
 )
 @click.option(
     "-m",
     "--multiomics",
     is_flag=True,
-    default=True,
+    default=False,
     help=DESC_VALIDATE_MULTIOMICS,
 )
 def metadata(input, outpath, paired_end, multiomics):
@@ -179,7 +179,7 @@ def metadata(input, outpath, paired_end, multiomics):
             output_path = Path(outpath)
         else:
             output_dir = Path(input)  # for log files
-            output_path = Path(input) / "metadata2.tsv"
+            output_path = Path(input) / "metadata_auto.tsv"
     else:
         # just validating metadata, not output metadata
         output_dir = Path(input).parents[0]  # for log files
