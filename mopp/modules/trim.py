@@ -144,7 +144,7 @@ def _run_trim_metars(r1_file, outdir):
 
 
 def _cat_paired(indir, outdir, identifier, omic, stem):
-    stem = stem.split('R2')[0]
+    stem = stem.split("R2")[0]
     commands = [
         f"cat {indir}/{stem}*.fq.gz > {outdir}/{identifier}_{omic}_trimmed.fq.gz"
     ]
