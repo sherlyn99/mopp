@@ -5,10 +5,15 @@ from pathlib import Path
 from mopp._defaults import (
     MSG_WELCOME,
     MSG_WELCOME_WORKFLOW,
+    MSG_WELCOME_METADATA,
     DESC_MD,
+    DESC_MD_OR_DIR,
+    DESC_MD_OUTPUT,
     DESC_INPUT,
     DESC_INPUT_SAM,
     DESC_OUTPUT,
+    DESC_VALIDATE_PAIRED_END,
+    DESC_VALIDATE_MULTIOMICS,
     DESC_INDEX,
     DESC_NTHREADS,
     DESC_RANK,
@@ -23,6 +28,11 @@ from mopp._defaults import (
     DESC_INPUT_COV,
     DESC_COMPRESS_SAM,
 )
+from mopp.modules.metadata import (
+    autogenerate_metadata,
+    validate_metadata,
+    load_metadata_to_df_with_validation,
+)
 from mopp.modules.trim import trim_files
 from mopp.modules.align import align_files
 from mopp.modules.coverages import calculate_coverages
@@ -33,7 +43,9 @@ from mopp.modules.utils import create_folder_without_clear
 
 logger = logging.getLogger("mopp")
 timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+formatter = logging.Formatter(
+    "%(asctime)s-%(name)s-%(levelname)s: %(message)s"
+)
 
 
 @click.group(help=MSG_WELCOME)
@@ -141,6 +153,68 @@ def workflow(
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
 
+@mopp.command(help=MSG_WELCOME_METADATA)
+@click.option("-i", "--input", required=True, help=DESC_MD_OR_DIR)
+@click.option("-o", "--outpath", required=False, help=DESC_MD_OUTPUT)
+@click.option(
+    "-p",
+    "--paired-end",
+    is_flag=True,
+    default=False,
+    help=DESC_VALIDATE_PAIRED_END,
+)
+@click.option(
+    "-m",
+    "--multiomics",
+    is_flag=True,
+    default=False,
+    help=DESC_VALIDATE_MULTIOMICS,
+)
+def metadata(input, outpath, paired_end, multiomics):
+    if Path(input).is_dir():
+        # create and validate metadata
+        if outpath:
+            output_dir = Path(outpath).parents[0]
+            output_path = Path(outpath)
+        else:
+            output_dir = Path(input)  # for log files
+            output_path = Path(input) / "metadata_auto.tsv"
+    else:
+        # just validate metadata, no output
+        output_dir = Path(input).parents[0]  # for log files
+
+    create_folder_without_clear(output_dir)
+
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(
+        f"{str(output_dir)}/mopp_metadata_{timestamp}.log"
+    )
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    if Path(input).is_dir():
+        # create and validate metadata
+        logger.info("Input directory detected. Auto-generating metadata...")
+        md_df = autogenerate_metadata(input)
+
+        logger.info("Metadata auto-generated. Validating...")
+        validate_metadata(md_df, paired_end, multiomics)
+
+        logger.info("Metadata validated.")
+
+        md_df.to_csv(output_path, sep="\t", index=False, header=True)
+        logger.info(f"Metadata written to {output_path}.")
+    else:
+        # just validate metadata
+        md_df = load_metadata_to_df_with_validation(
+            input, paired_end, multiomics
+        )
+        logger.info("Metadata validated.")
+
+
 @mopp.command()
 @click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
 @click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
@@ -151,7 +225,7 @@ def trim(input_dir, output_dir, metadata, threads):
 
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(
-        f"{output_dir}/mopp_workflow_{timestamp}.log"
+        f"{output_dir}/mopp_trim_{timestamp}.log"
     )
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)

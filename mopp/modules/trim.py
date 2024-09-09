@@ -2,9 +2,8 @@ import logging
 import subprocess
 from pathlib import Path
 from mopp.modules.utils import pool_processes
-from mopp.modules.metadata import load_metadata
 from mopp.modules.utils import create_folder_without_clear
-from multiprocessing import Pool
+from mopp.modules.metadata import load_metadata_to_dict_with_validation
 
 
 logger = logging.getLogger("mopp")
@@ -32,7 +31,7 @@ def cat_paired(args):
 
 def trim_files(indir, outdir, md_path, threads):
     # load metadata into md_dict
-    md_dict = load_metadata(md_path)
+    md_dict = load_metadata_to_dict_with_validation(md_path)
 
     # create ./trimmed, if outdir already existed, will not clear content, might overwrite
     outdir_cat = Path(outdir)
@@ -50,17 +49,17 @@ def trim_files(indir, outdir, md_path, threads):
             r1_file = Path(indir) / omic_dict[omic][0]
             r1_stem = str.split(str(r1_file.name), ".")[0]
 
-            if omic == "metaRS":
-                arg_list_metars.append((r1_file, outdir_trimmed))
-                arg_list_renamefiles.append(
-                    (outdir_trimmed, outdir_cat, identifier, omic, r1_stem)
-                )
-            else:
+            if len(omic_dict[omic]) == 2:
                 r2_file = Path(indir) / omic_dict[omic][1]
                 r2_stem = str.split(str(r2_file.name), ".")[0]
                 arg_list_trimpaired.append((r1_file, r2_file, outdir_trimmed))
                 arg_list_catpaired.append(
                     (outdir_trimmed, outdir_cat, identifier, omic, r2_stem)
+                )
+            else:
+                arg_list_metars.append((r1_file, outdir_trimmed))
+                arg_list_renamefiles.append(
+                    (outdir_trimmed, outdir_cat, identifier, omic, r1_stem)
                 )
 
     pool_processes(
