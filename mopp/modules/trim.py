@@ -1,10 +1,9 @@
 import logging
 import subprocess
 from pathlib import Path
-from mopp.modules.utils import create_folder_without_clear
 from mopp.modules.utils import pool_processes
+from mopp.modules.utils import create_folder_without_clear
 from mopp.modules.metadata import load_metadata_to_dict_with_validation
-from multiprocessing import Pool
 
 logger = logging.getLogger("mopp")
 
