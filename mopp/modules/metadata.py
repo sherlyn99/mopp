@@ -58,7 +58,7 @@ def _md_to_dict(md_df):
             row["omic"],
             row["strand"],
         )
-        if identifier not in md_dict:
+        if identifier not in md_dict:       
             md_dict[identifier] = {
                 "metaG": [-1, -1],
                 "metaT": [-1, -1],
