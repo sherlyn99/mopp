@@ -71,7 +71,7 @@ def calculate_coverages(input_dir, output_dir, genome_lengths):
 
     cli_compress(
         input_dir,
-        output_dir + "/cov_percentages.tsv",
+        output_dir,
         genome_lengths,
         disable_compression=False,
         skip_intermediate=True,
