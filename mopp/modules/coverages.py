@@ -31,7 +31,7 @@ def plot_genome_density(input, output_dir):
     plt.figure(figsize=(10, 6))
     plt.fill_between(x_filtered, kde_values_filtered, color="#4c9390", alpha=0.8)
     print(kde_values.max())
-    plt.ylim(kde_values_filtered.min(), min(kde_values.max() + 0.05, 1.2))
+    plt.ylim(kde_values_filtered.min(), min(kde_values.max()*1.1, 1.2))
     plt.xlabel(f"Genome Coverage ({threshold}-100%)")
     plt.ylabel("Density")
     plt.xticks(range(0, 100, 10))
