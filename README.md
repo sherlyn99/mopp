@@ -71,11 +71,7 @@ bowtie2-build --seed 42 /tmp/input.fna databases/bowtie2/WoLr1
 rm /tmp/input.fna
 ```
 
-MOPP uses `zebra-filter` for calculating genome coverages and filtering genomes based on coverage thresholds. This library is not included in the distribution and must be downloaded independently [here](https://github.com/biocore/zebra_filter).
-```
-# make sure your are in mopp/mopp_db
-git clone https://github.com/biocore/zebra_filter.git
-```
+MOPP uses `micov` for calculating genome coverages and filtering genomes based on coverage thresholds. This library is included in the conda environment. Learn more about it [here](https://github.com/biocore/micov).
 
 ***
 
@@ -83,7 +79,7 @@ git clone https://github.com/biocore/zebra_filter.git
 
 <h4> <p align ="center"> mopp workflow </p> </h4>
 
-usage: `mopp workflow -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -x <Index> -t <Num Threads> -z <zebra-filter Path> -c <Cutoff> -ref <Reference Database> -p <Index Prefix>`
+usage: `mopp workflow -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -x <Index> -t <Num Threads> -l <Genome Lengths Path> -c <Cutoff> -ref <Reference Database> -p <Index Prefix>`
 
 example: 
 ```
@@ -92,7 +88,7 @@ mopp workflow -i ./test/data \
               -m ./test/data/metadata.tsv \
               -x ./test/data/wol_subset_index/wol_subset0.1_index \
               -t 4 \
-              -z /home/y1weng/zebra_filter \
+              -l /home/y1weng/genome_lengths.tsv \
               -c 0.1 \
               -ref ./test/data/wol_subset_index/wol_above10.concat.fna \
               -p myTest \
@@ -156,16 +152,16 @@ mopp align -i ./test/data/out3/cat \
 
 <h4> <p align ="center"> mopp cov </p> </h4>
 
-usage: `mopp cov -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -z <zebra-filter Path>`
+usage: `mopp cov -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -l <Genome Lengths Path>`
 
 example: 
 ```
 mopp cov -i ./test/data/out3/aligned/samfiles \
    -o ./test/data/out3/cov \
-   -z /home/y1weng/zebra_filter
+   -l /home/y1weng/genome_lengths.tsv
 ```
 
-`mopp cov` uses zebra-filter's calculate_coverages.py to produce a spreadsheet with calculated genome coverages. This is essential for selecting an optimal coverage threshold when generating a subset index.
+`mopp cov` uses micov's `compress` to produce a spreadsheet with calculated genome coverages. This is essential for selecting an optimal coverage threshold when generating a subset index.
 
 <h2> <p align ="center"> </p> </h2>
 
