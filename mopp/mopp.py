@@ -60,7 +60,7 @@ def mopp():
 @click.option("-m", "--metadata", required=True, help=DESC_MD)
 @click.option("-x", "--index", required=True, help=DESC_INDEX)  # wol bt2 index
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
-@click.option("-g", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_GENOME_LENGTHS)
+@click.option("-l", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_GENOME_LENGTHS)
 @click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
 @click.option("-ref", "--refdb", required=True, help=DESC_REFDB)  # index wol.fna
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)  # index prefix
@@ -276,7 +276,7 @@ def align(input_dir, output_dir, pattern, index, threads, compress_samfiles):
 # fmt: off
 @click.option("-i", "--input-dir", type=click.Path(exists=True), required=True, help=DESC_INPUT_SAM,)
 @click.option("-o", "--output-dir", type=click.Path(exists=False), required=True, help=DESC_OUTPUT)
-@click.option("-g", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_GENOME_LENGTHS)
+@click.option("-l", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_GENOME_LENGTHS)
 # fmt: on
 def cov(input_dir, output_dir, genome_lengths):
     create_folder_without_clear(output_dir)
