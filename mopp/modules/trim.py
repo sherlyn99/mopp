@@ -152,10 +152,12 @@ def _cat_paired(indir, outdir, identifier, omic, stem):
     )
     output, error = p.communicate()
     if p.returncode != 0:
-        err = f"Concatenation of {stem} trimmed files failed with code {p.returncode} and error {error}"
+        err = f"Concatenation of {stem.rstrip('_')} trimmed files failed with code {p.returncode} and error {error}"
         logger.error(err)
     else:
-        logger.info(f"Concatenation of {stem} trimmed files finished")
+        logger.info(
+            f"Concatenation of {stem.rstrip('_')} trimmed files finished"
+        )
     return
 
 
