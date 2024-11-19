@@ -32,13 +32,21 @@ def gen_feature_table(
         suffix = suffix.lstrip(".")
 
     Path(outdir).mkdir(parents=True, exist_ok=True)
+    mapdir = os.path.join(outdir, "mapdir")
     file_ogu = f"{outdir}/ogu.{suffix}"
     file_tax = f"{outdir}/tax.{suffix}"
     file_ogu_orf = f"{outdir}/ogu_orf.{suffix}"
     file_tax_orf = os.path.join(outdir, f"tax_orf.{suffix}")
     file_tax_func = os.path.join(outdir, f"tax_func.{suffix}")
     file_ogu_func = os.path.join(outdir, f"ogu_func.{suffix}")
-    mapdir = os.path.join(outdir, "mapdir")
+
+    commands = gen_commands_features(
+        indir,
+        file_ogu,
+        mapdir,
+        None,
+    )
+    run_command(commands, f"Generating {file_ogu}")
 
     if strat:
         if not coords_map:
@@ -91,13 +99,6 @@ def gen_feature_table(
                 )
                 run_command(commands, f"Generating {file_ogu_func}")
     else:
-        commands = gen_commands_features(
-            indir,
-            file_ogu,
-            mapdir,
-            None,
-        )
-        run_command(commands, f"Generating {file_ogu}")
 
         if tax_map:
             commands = gen_commands_collapse(

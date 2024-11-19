@@ -395,6 +395,18 @@ def features(
     func_map,
     divide,
 ):
+    create_folder_without_clear(Path(output_dir))
+
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(
+        f"{output_dir}/mopp_features_{timestamp}.log"
+    )
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
     gen_feature_table(
         input_dir,
         output_dir,
