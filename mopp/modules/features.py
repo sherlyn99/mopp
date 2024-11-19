@@ -1,3 +1,4 @@
+import os
 import logging
 import subprocess
 from pathlib import Path
@@ -6,125 +7,176 @@ from mopp.modules.utils import create_folder_without_clear
 logger = logging.getLogger("mopp")
 
 
-def ft_generation(indir, outdir, db, rank: list, stratification):
-    outdir = Path(outdir)
-    create_folder_without_clear(outdir)
+# mopp features \
+#   -i <sam_dir> \
+#   -o <out_dir> \
+#   -strat \
+#   -tax map (optional) \
+#   -func map (optional)
 
-    if "genus" in rank:
-        message = "genus level feature table generation"
-        commands = _commands_generation_woltka("genus", indir, outdir, db)
-        logger.info(f"{message} started")
-        p = subprocess.Popen(
-            commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+
+def gen_feature_table(
+    indir,
+    outdir,
+    suffix,
+    strat,
+    coords_map,
+    tax_map,
+    func_map,
+    divide,
+    names=None,
+):
+    if not suffix:
+        raise ValueError("Suffix must be provided.")
+    else:
+        suffix = suffix.lstrip(".")
+
+    Path(outdir).mkdir(parents=True, exist_ok=True)
+    file_ogu = f"{outdir}/ogu.{suffix}"
+    file_tax = f"{outdir}/tax.{suffix}"
+    file_ogu_orf = f"{outdir}/ogu_orf.{suffix}"
+    file_tax_orf = os.path.join(outdir, f"tax_orf.{suffix}")
+    file_tax_func = os.path.join(outdir, f"tax_func.{suffix}")
+    file_ogu_func = os.path.join(outdir, f"ogu_func.{suffix}")
+    mapdir = os.path.join(outdir, "mapdir")
+
+    if strat:
+        if not coords_map:
+            raise ValueError(
+                "Stratification without coords is not supported. Please specify '--coords'."
+            )
+
+        commands = gen_commands_features(
+            indir,
+            file_ogu_orf,
+            mapdir,
+            coords_map,
         )
-        output, error = p.communicate()
-        if p.returncode != 0:
-            logger.error(
-                f"{message} failed with code {p.returncode} and error {error.decode('utf-8')}"
-            )
-        else:
-            logger.info(f"{message} finished")
+        run_command(commands, f"Generating {file_ogu_orf}")
 
-        if stratification:
-            message = "genus-uniref stratified feature table generation"
-            commands = _commands_stratification_generation_woltka(
-                "genus", indir, outdir, db
+        if tax_map:
+
+            commands = gen_commands_collapse(
+                file_ogu_orf,
+                file_tax_orf,
+                "|",
+                1,
+                tax_map,
+                divide,
+                names,
             )
-            logger.info(f"{message} started")
-            p = subprocess.Popen(
-                commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
-            output, error = p.communicate()
-            if p.returncode != 0:
-                logger.error(
-                    f"{message} failed with code {p.returncode} and error {error.decode('utf-8')}"
+            run_command(commands, f"Generating {file_tax_orf}")
+
+        if func_map:
+            if tax_map:
+                commands = gen_commands_collapse(
+                    file_tax_orf,
+                    file_tax_func,
+                    "|",
+                    2,
+                    func_map,
+                    divide,
+                    names,
                 )
+                run_command(commands, f"Generating {file_tax_func}")
             else:
-                logger.info(f"{message} finished")
-
-    if "species" in rank:
-        message = "species level feature table generation"
-        commands = _commands_generation_woltka("species", indir, outdir, db)
-        logger.info(f"{message} started")
-        p = subprocess.Popen(
-            commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                commands = gen_commands_collapse(
+                    file_ogu_orf,
+                    file_ogu_func,
+                    "|",
+                    2,
+                    func_map,
+                    divide,
+                    names,
+                )
+                run_command(commands, f"Generating {file_ogu_func}")
+    else:
+        commands = gen_commands_features(
+            indir,
+            file_ogu,
+            mapdir,
+            None,
         )
-        output, error = p.communicate()
-        if p.returncode != 0:
-            logger.error(
-                f"{message} failed with code {p.returncode} and error {error.decode('utf-8')}"
-            )
-        else:
-            logger.info(f"{message} finished")
+        run_command(commands, f"Generating {file_ogu}")
 
-        if stratification:
-            message = "species-uniref stratified feature table generation"
-            commands = _commands_stratification_generation_woltka(
-                "species", indir, outdir, db
+        if tax_map:
+            commands = gen_commands_collapse(
+                file_ogu,
+                file_tax,
+                None,
+                None,
+                tax_map,
+                divide,
+                names,
             )
-            logger.info(f"{message} started")
-            p = subprocess.Popen(
-                commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            run_command(commands, f"Generating {file_tax}")
+
+        if func_map:
+            raise ValueError(
+                "Function map provided without stratification is not supported. Try add '-strat'."
             )
-            output, error = p.communicate()
-            if p.returncode != 0:
-                logger.error(
-                    f"{message} failed with code {p.returncode} and error {error.decode('utf-8')}"
-                )
-            else:
-                logger.info(f"{message} finished")
-    return
 
 
-def _commands_generation_woltka(rank: str, indir, outdir, db):
+def gen_commands_features(
+    indir,
+    outfile,
+    mapdir,
+    coords_map,
+):
     commands = [
         "woltka",
         "classify",
-        "--input",
+        "-i",
         indir,
-        "--map",
-        f"{db}/taxonomy/taxid.map",
-        "--nodes",
-        f"{db}/taxonomy/nodes.dmp",
-        "--names",
-        f"{db}/taxonomy/names.dmp",
-        "--rank",
-        rank,
-        "--name-as-id",
-        "--outmap",
-        f"{outdir}/{rank}_level/mapdir",
-        "--output",
-        f"{outdir}/{rank}_level/counts_{rank}.tsv",
+        "-o",
+        outfile,
     ]
+
+    if coords_map:
+        commands += ["--coords", coords_map, "--stratify", mapdir]
+    else:
+        commands += ["--outmap", mapdir]
     return commands
 
 
-def _commands_stratification_generation_woltka(rank: str, indir, outdir, db):
+def gen_commands_collapse(infile, outfile, sep, field, map, divide, names):
     commands = [
         "woltka",
-        "classify",
-        "--input",
-        indir,
-        "--coords",
-        f"{db}/proteins/coords.txt.xz",
-        "--map",
-        f"{db}/function/uniref/uniref.map.xz",
-        "--map",
-        f"{db}/function/go/process.map.xz",
-        "--map-as-rank",
-        "--rank",
-        "process",
-        "-n",
-        f"{db}/function/uniref/uniref.name.xz",
-        "-r",
-        "uniref",
-        "--stratify",
-        f"{outdir}/{rank}_level/mapdir",
-        "--output",
-        f"{outdir}/{rank}_level/counts_{rank}_stratified.tsv",
+        "collapse",
+        "-i",
+        infile,
+        "-o",
+        outfile,
+        "-m",
+        map,
     ]
+
+    if sep and field:
+        commands += [
+            "-s",
+            str(sep),
+            "-f",
+            str(field),
+        ]
+
+    if divide:
+        commands += ["--divide"]
+
+    if names:
+        commands += ["--name", names]
+
     return commands
 
 
-if __name__ == "__main__":
-    ft_generation()
+def run_command(commands, message):
+    logger.info(f"{message} started")
+    p = subprocess.Popen(
+        commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    output, error = p.communicate()
+    if p.returncode != 0:
+        logger.error(
+            f"{message} failed with code {p.returncode} and error {error.decode('utf-8')}"
+        )
+    else:
+        logger.info(f"{message} finished")

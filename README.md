@@ -158,7 +158,7 @@ example:
 ```
 mopp cov -i ./test/data/out3/aligned/samfiles \
    -o ./test/data/out3/cov \
-   -l /home/y1weng/genome_lengths.tsv
+   -l genome_lengths.tsv
 ```
 
 `mopp cov` uses micov's `compress` to produce a spreadsheet with calculated genome coverages. This is essential for selecting an optimal coverage threshold when generating a subset index.

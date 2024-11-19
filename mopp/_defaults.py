@@ -69,13 +69,20 @@ DESC_STRAT = (
 DESC_WOLTKA_DB = "Path to woltka database."
 
 # module: index
-DESC_GENOME_LENGTHS = "Path to a file with genome lengths."
+DESC_GENOME_LENGTHS = "Path to a file with genome lengths, a tsv with the first column as genome id and the second column as genome length (bp)."
 DESC_CUTOFF = (
     "The genome coverage cutoff threshold for generating the subset index."
 )
 DESC_REFDB = "Path to the reference database file (.fna, .fna.gz, .fna.xz)."
 DESC_PREFIX = "Prefix for generated files."
 DESC_INPUT_COV = "Path to the coverage file in tab-separated format."
+
+# module: features
+DESC_SUFFIX = "Suffix of output files. e.g. 'biom' or 'tsv'."
+DESC_COORDS_MAP = "Path to the coords.txt.xz file."
+DESC_TAX_MAP = "Path to the mapping file from genome id to taxa name."
+DESC_FUNC_MAP = "Path to the mapping file from gene coords to others (e.g. uniref, ko .etc)."
+DESC_DIVIDE = "If true, count each target feature as 1/k (k is the number of targets mapped to a source). Otherwise, count as one."
 
 
 # try:
