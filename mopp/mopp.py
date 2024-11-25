@@ -34,6 +34,7 @@ from mopp.modules.metadata import (
     load_metadata_to_df_with_validation,
 )
 from mopp.modules.trim import trim_files
+from mopp.modules.contam import calculate_contamination
 from mopp.modules.align import align_files
 from mopp.modules.coverages import calculate_coverages
 from mopp.modules.index import genome_extraction
@@ -235,6 +236,29 @@ def trim(input_dir, output_dir, metadata, threads):
 
     try:
         trim_files(input_dir, output_dir, metadata, threads)
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}", exc_info=True)
+
+@mopp.command()
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
+@click.option("-m", "--metadata", required=True, help=DESC_MD)
+@click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
+def rnacontam(input_dir, output_dir, metadata, threads):
+    create_folder_without_clear(Path(output_dir))
+
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(
+        f"{output_dir}/mopp_rnacontam_{timestamp}.log"
+    )
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    try:
+        calculate_contamination(input_dir, output_dir, metadata, threads)
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
 
