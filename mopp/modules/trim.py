@@ -1,3 +1,5 @@
+import sys
+import shutil
 import logging
 import subprocess
 from pathlib import Path
@@ -7,7 +9,6 @@ from mopp.modules.metadata import load_metadata_to_dict_with_validation
 
 
 logger = logging.getLogger("mopp")
-
 
 def run_trim_metars(args):
     r1, outdir = args
@@ -30,6 +31,12 @@ def cat_paired(args):
 
 
 def trim_files(indir, outdir, md_path, threads):
+    # check if trim_galore is installed
+    if shutil.which("trim_galore") is None:
+        logger.error("trim_galore is not installed or not found in the system path.")
+        sys.exit(1)
+        return  # Exit the function if trim_galore is not available
+
     # load metadata into md_dict
     md_dict = load_metadata_to_dict_with_validation(md_path)
 
@@ -94,6 +101,10 @@ def _rename_files(indir, outdir, identifier, omic, stem):
 
 
 def _run_trim_paired(r1_file, r2_file, outdir):
+    if shutil.which("trim_galore") is None:
+        logger.error("trim_galore is not installed or not found in the system path.")
+        return  
+    
     commands = [
         "trim_galore",
         "--paired",
