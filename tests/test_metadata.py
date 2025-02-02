@@ -30,13 +30,13 @@ class metadataTests(unittest.TestCase):
         df_obs = autogenerate_metadata("indir")
         expected_data = {
             "sample_name": [
-                "indir/sample1_metaG_R1.fastq.gz",
-                "indir/sample2_metaG_R2.fastq.gz",
-                "indir/sample3_metaRS_R1.fq.gz",
+                "sample1_metaG_R1.fastq.gz", # only record filenames
+                "sample2_metaG_R2.fastq.gz",
+                "sample3_metaRS_R1.fq.gz",
             ],
             "identifier": ["sample1", "sample2", "sample3"],
             "omic": ["metaG", "metaG", "metaRS"],
-            "strand": ["R1", "R2", "R1"],
+            "strand": ["r1", "r2", "r1"],
         }
         df_exp = pd.DataFrame(expected_data)
 
