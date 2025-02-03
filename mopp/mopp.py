@@ -289,7 +289,7 @@ def cov(input_dir, output_dir, genome_lengths):
 
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(
-        f"{output_dir}/mopp_workflow_{timestamp}.log"
+        f"{output_dir}/mopp_cov_{timestamp}.log"
     )
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
@@ -318,7 +318,7 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
 
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(
-        f"{output_dir}/mopp_workflow_{timestamp}.log"
+        f"{output_dir}/mopp_index_{timestamp}.log"
     )
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
@@ -356,7 +356,7 @@ def feature_table(
 
     logger.setLevel(logging.INFO)
     filer_handler = logging.FileHandler(
-        f"{output_dir}/mopp_workflow_{timestamp}.log"
+        f"{output_dir}/mopp_features_{timestamp}.log"
     )
     filer_handler.setFormatter(formatter)
     logger.addHandler(filer_handler)
