@@ -187,8 +187,8 @@ def _commands_generation_bt2build(
         output_fna_file,
         f"{output_bt2index}/{prefix}",
         "--large-index",
-        # "-p",
-        # str(nthreads),
+        "--threads",
+        str(nthreads),
     ]
     return commands
 
