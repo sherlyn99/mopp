@@ -62,6 +62,9 @@ def plot_effect_of_filteration(input, output_dir):
         num_remaining = sum(percent_covered >= min_coverage)
         x_vals.append(min_coverage)
         y_vals.append(num_remaining)
+    if not any(x >= 100 for x in x_vals): ## This will standardize the plot ending at 100%
+        x_vals.append(100)
+        y_vals.append(1) #Log transform = 0
     plt.figure(figsize=(10, 6))
     plt.plot(x_vals, y_vals, linewidth=2.0)
     plt.yscale("log")
