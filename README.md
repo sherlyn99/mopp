@@ -37,18 +37,29 @@ To install the most up-to-date version of mopp, run the following command
 ```
 git clone https://github.com/sherlyn99/mopp.git
 cd mopp
-conda env create -f mopp.yml -n mopp
+conda env create -f mopp_<os>.yml -n mopp
 conda activate mopp
 pip install -e .
-```
-or use mamba for faster installation
-```
-git clone https://github.com/sherlyn99/mopp.git
-cd mopp
-conda install mamba -n base -c conda-forge # skip if mamba is already installed
-mamba env create -f mopp.yml
-mamba activate mopp
+
+# install the coverage-calculation tool, micov, separately
+cd ..
+git clone https://github.com/biocore/micov.git
+cd micov
 pip install -e .
+```
+or use mamba for faster installation. 
+
+Run the following command to make sure the installation is complete.
+```
+micov --help
+
+mopp --help
+```
+
+Note that if the creation of conda environment using yml files fails, an alternative is to do the following
+```
+conda create -n mopp_dev_sherlyn python=3.12 -c conda-forge -c bioconda \
+  matplotlib scipy polars click tqdm numba duckdb pyarrow bowtie2 trim-galore woltka
 ```
 
 ***
