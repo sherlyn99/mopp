@@ -62,6 +62,8 @@ conda create -n mopp_dev_sherlyn python=3.12 -c conda-forge -c bioconda \
   matplotlib scipy polars click tqdm numba duckdb pyarrow bowtie2 trim-galore woltka
 ```
 
+Micov runs on matplotlib >= 3.9 and polars-u64-idx >= 1.21.
+
 ***
 <h2> <p align ="center"> Dependencies </p> </h2>
 
