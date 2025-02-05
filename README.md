@@ -24,15 +24,6 @@ Different use cases may have more requirements, but for every use case, the foll
 ***
 <h2> <p align ="center"> Installation </p> </h2>
 
-MOPP works with python >= 3.8 and linux-based web servers. 
-To install mopp using pip, run the following command
-```
-conda create -n mopp python=3.8
-conda activate mopp
-conda install -c conda-forge -c bioconda bowtie2 trim-galore woltka
-pip3 install mopp
-```
-
 To install the most up-to-date version of mopp, run the following command
 ```
 git clone https://github.com/sherlyn99/mopp.git
@@ -41,6 +32,7 @@ conda env create -f mopp_<os>.yml -n mopp
 conda activate mopp
 pip install -e .
 
+# do not deactivate the conda environment at this moment
 # install the coverage-calculation tool, micov, separately
 cd ..
 git clone https://github.com/biocore/micov.git
@@ -63,6 +55,8 @@ conda create -n mopp_dev_sherlyn python=3.12 -c conda-forge -c bioconda \
 ```
 
 Micov runs on matplotlib >= 3.9 and polars-u64-idx >= 1.21.
+
+Note that if you did `pip install -e .`, which is a local installation, you need to keep the source code (do not delete it) for the package to run.
 
 ***
 <h2> <p align ="center"> Dependencies </p> </h2>
