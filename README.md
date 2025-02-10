@@ -155,7 +155,7 @@ mopp align -i ./test/data/out3/cat \
 
 `mopp align` aligns the sequencing data provided in the input directory to the reference index. Providing a file pattern `-p` allows for specification of files with certain name patterns. Allocating more threads to this command `-t` can reduce processing time.
 
-The index `-x` is created by the bowtie2-build command. This command outputs the forward (.bt2) and reverse (rev.bt2) index files. Our parameter requests the common prefix that is shared by all these files, before the forward/reverse designation.
+The `-x` argument accepts the path and prefix of the index files created by the bowtie2-build command. bowtie2-build outputs the forward (.bt2) and reverse (rev.bt2) index files. Our parameter requests the common prefix that is shared by all these files, before the forward/reverse designation.
 
 
 
