@@ -27,6 +27,11 @@ from mopp._defaults import (
     DESC_REFDB,
     DESC_INPUT_COV,
     DESC_COMPRESS_SAM,
+    DESC_SUFFIX,
+    DESC_COORDS_MAP,
+    DESC_TAX_MAP,
+    DESC_FUNC_MAP,
+    DESC_DIVIDE,
 )
 from mopp.modules.metadata import (
     autogenerate_metadata,
@@ -37,8 +42,9 @@ from mopp.modules.trim import trim_files
 from mopp.modules.align import align_files
 from mopp.modules.coverages import calculate_coverages
 from mopp.modules.index import genome_extraction
-from mopp.modules.features import ft_generation
+from mopp.modules.features_wol1 import ft_generation
 from mopp.modules.utils import create_folder_without_clear
+from mopp.modules.features import gen_feature_table
 
 
 logger = logging.getLogger("mopp")
@@ -366,6 +372,51 @@ def feature_table(
         )
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
+
+
+# fmt: off
+@mopp.command()
+@click.option("-i", "--input-dir", required=True, help=DESC_INPUT_SAM)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
+@click.option("-s", "--suffix", default="tsv", help=DESC_SUFFIX)
+@click.option("-strat", "--stratification", is_flag=True, default=False, help=DESC_STRAT)
+@click.option("-c", "--coords-map", help=DESC_COORDS_MAP)
+@click.option("-tax", "--tax-map", help=DESC_TAX_MAP)
+@click.option("-func", "--func-map", help=DESC_FUNC_MAP)
+@click.option("-d", "--divide", is_flag=True, default=False, help=DESC_DIVIDE)
+# fmt: on
+def features(
+    input_dir,
+    output_dir,
+    suffix,
+    stratification,
+    coords_map,
+    tax_map,
+    func_map,
+    divide,
+):
+    create_folder_without_clear(Path(output_dir))
+
+    logger.setLevel(logging.INFO)
+    filer_handler = logging.FileHandler(
+        f"{output_dir}/mopp_features_{timestamp}.log"
+    )
+    filer_handler.setFormatter(formatter)
+    logger.addHandler(filer_handler)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    gen_feature_table(
+        input_dir,
+        output_dir,
+        suffix,
+        stratification,
+        coords_map,
+        tax_map,
+        func_map,
+        divide,
+    )
 
 
 if __name__ == "__main__":

@@ -38,7 +38,7 @@ def genome_extraction(
     output_bt2index = outdir_index / f"{prefix}_bt2index"
     create_folder_without_clear(output_bt2index)
     output_fna_file = _genome_extract(
-        gotu_filtered_list, refdb, str(output_bt2index), prefix
+        gotu_filtered_list, refdb, str(outdir_index), prefix
     )
     _build_db(output_fna_file, output_bt2index, prefix, nthreads)
 
@@ -187,8 +187,8 @@ def _commands_generation_bt2build(
         output_fna_file,
         f"{output_bt2index}/{prefix}",
         "--large-index",
-        # "-p",
-        # str(nthreads),
+        "--threads",
+        str(nthreads),
     ]
     return commands
 

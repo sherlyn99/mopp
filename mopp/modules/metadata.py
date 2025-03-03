@@ -27,6 +27,7 @@ def autogenerate_metadata(indir):
         "r"
         + filenames_nosuffix.str.split("_meta|_R").str[2].str.split("_").str[0]
     )
+    md = md.sort_values(by=['identifier', 'omic', 'strand']).reset_index(drop=True)
     return md
 
 
