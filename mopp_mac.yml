@@ -1,0 +1,20 @@
+name: mopp
+channels:
+  - conda-forge
+  - bioconda
+  - r
+  - ursky
+  - defaults
+dependencies:
+  - python=3.12
+  - conda-forge::matplotlib
+  - conda-forge::scipy
+  - tqdm
+  - click
+  - polars
+  - pyarrow
+  - duckdb
+  - numba
+  - bioconda::trim-galore
+  - bioconda::bowtie2
+  - bioconda::woltka

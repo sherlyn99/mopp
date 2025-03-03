@@ -24,32 +24,39 @@ Different use cases may have more requirements, but for every use case, the foll
 ***
 <h2> <p align ="center"> Installation </p> </h2>
 
-MOPP works with python >= 3.8 and linux-based web servers. 
-To install mopp using pip, run the following command
-```
-conda create -n mopp python=3.8
-conda activate mopp
-conda install -c conda-forge -c bioconda bowtie2 trim-galore woltka
-pip3 install mopp
-```
-
 To install the most up-to-date version of mopp, run the following command
 ```
 git clone https://github.com/sherlyn99/mopp.git
 cd mopp
-conda env create -f mopp.yml -n mopp
+conda env create -f mopp_<os>.yml -n mopp
 conda activate mopp
 pip install -e .
-```
-or use mamba for faster installation
-```
-git clone https://github.com/sherlyn99/mopp.git
-cd mopp
-conda install mamba -n base -c conda-forge # skip if mamba is already installed
-mamba env create -f mopp.yml
-mamba activate mopp
+
+# do not deactivate the conda environment at this moment
+# install the coverage-calculation tool, micov, separately
+cd ..
+git clone https://github.com/biocore/micov.git
+cd micov
 pip install -e .
 ```
+or use mamba for faster installation. 
+
+Run the following command to make sure the installation is complete.
+```
+micov --help
+
+mopp --help
+```
+
+Note that if the creation of conda environment using yml files fails, an alternative is to do the following
+```
+conda create -n mopp_dev_sherlyn python=3.12 -c conda-forge -c bioconda \
+  matplotlib scipy polars click tqdm numba duckdb pyarrow bowtie2 trim-galore woltka
+```
+
+Micov runs on matplotlib >= 3.9 and polars-u64-idx >= 1.21.
+
+Note that if you did `pip install -e .`, which is a local installation, you need to keep the source code (do not delete it) for the package to run.
 
 ***
 <h2> <p align ="center"> Dependencies </p> </h2>
@@ -147,6 +154,10 @@ mopp align -i ./test/data/out3/cat \
 ```
 
 `mopp align` aligns the sequencing data provided in the input directory to the reference index. Providing a file pattern `-p` allows for specification of files with certain name patterns. Allocating more threads to this command `-t` can reduce processing time.
+
+The `-x` argument accepts the path and prefix of the index files created by the bowtie2-build command. bowtie2-build outputs the forward (.bt2) and reverse (rev.bt2) index files. Our parameter requests the common prefix that is shared by all these files, before the forward/reverse designation.
+
+
 
 <h2> <p align ="center"> </p> </h2>
 
