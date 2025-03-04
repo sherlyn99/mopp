@@ -199,8 +199,8 @@ example:
 mopp align \
    -i ./tests/test_out/trimmed \
    -p '*metaG*.fq.gz' \
-   -x ./tests/test_database/wol_subset_index/wol_subset0.1_index \
-   -o ./tests/test_out/aligned \
+   -x ./tests/test_database/reference/databases/bowtie2/db \
+   -o ./tests/test_out/aligned_metaG \
    -t 4 \
    --compress-samfiles
 ```
@@ -222,7 +222,7 @@ example:
 mopp cov \
    -i ./tests/test_out/aligned_metaG/samfiles \
    -o ./tests/test_out/cov \
-   -l ./tests/test_database/genome_lengths.tsv
+   -l ./tests/test_database/reference/genomes/length.map
 ```
 
 `mopp cov` uses micov's `compress` to produce a spreadsheet with calculated genome coverages. This is essential for selecting an optimal coverage threshold when generating a subset index.
@@ -231,18 +231,19 @@ mopp cov \
 
 <h4> <p align ="center"> mopp generate_index </p> </h4>
 
-usage: `mopp generate-index -i <Input Coverage> -o <Output Directory> -c <Cutoff> -ref <Reference Database> -p <Prefix>`
+usage: `mopp index -i <Input Coverage> -o <Output Directory> -c <Cutoff> -ref <Reference Database> -p <Prefix>`
 
 example: 
 ```
-mopp generate-index -i ./test/data/out2/cov/coverages.tsv \
-   -c 0.1 \
-   -ref ./test/data/wol_subset_index/wol_above10.concat.fna \
-   -o ./test/data/out3/index \
-   -p myTest
+mopp index \
+   -i ./tests/test_out/cov/coverage_calculation.tsv \
+   -c 20 \
+   -ref ./tests/test_database/reference/genomes/db.fna \
+   -o  ./tests/test_out/index \
+   -p db_subset
 ```
 
-`mopp generate-index` creates a subset index from a larger database, given a cutoff threshold. For example, `-c 0.2` would generate a subset that only contains genomes with 20% or greater coverage.
+`mopp index` creates a subset index from a larger database, given a cutoff threshold. For example, `-c 0.2` would generate a subset that only contains genomes with 20% or greater coverage.
 
 <h2> <p align ="center"> </p> </h2>
 
