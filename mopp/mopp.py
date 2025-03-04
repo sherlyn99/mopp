@@ -42,7 +42,7 @@ from mopp.modules.trim import trim_files
 from mopp.modules.align import align_files
 from mopp.modules.coverages import calculate_coverages
 from mopp.modules.index import genome_extraction
-from mopp.modules.features_wol1 import ft_generation
+from mopp.modules.features_wol import ft_generation
 from mopp.modules.utils import create_folder_without_clear
 from mopp.modules.features import gen_feature_table
 
@@ -111,14 +111,14 @@ def workflow(
     logger.addHandler(stream_handler)
 
     try:
-        outdir_trimmed = Path(output_dir) / "cat"
+        outdir_trimmed = Path(output_dir) / "trimmed"
         outdir_aligned_metaG = Path(output_dir) / "aligned_metaG"
         outdir_aligned_metaG_samfiles = outdir_aligned_metaG / "samfiles"
         outdir_aligned = Path(output_dir) / "aligned"
         outdir_aligned_samfiles = outdir_aligned / "samfiles"
         outdir_cov = Path(output_dir) / "coverages"
         outdir_cov_file = (
-            Path(output_dir) / "coverages" / "coverage_percentage.txt"
+            Path(output_dir) / "coverages" / "coverage_calculation.tsv"
         )
         outdir_index = Path(output_dir) / "index"
         outdir_index_path = outdir_index / f"{prefix}_bt2index" / prefix
@@ -313,7 +313,7 @@ def cov(input_dir, output_dir, genome_lengths):
 @click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)
 @click.option("-t", "--threads", default=4, help=DESC_NTHREADS)
-def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
+def index(input_cov, cutoff, refdb, output_dir, prefix, threads):
     create_folder_without_clear(Path(output_dir))
 
     logger.setLevel(logging.INFO)
@@ -349,7 +349,7 @@ def generate_index(input_cov, cutoff, refdb, output_dir, prefix, threads):
 @click.option(
     "-strat", "--stratification", is_flag=True, default=False, help=DESC_STRAT
 )
-def feature_table(
+def features(
     rank, input_dir, output_dir, woltka_database, stratification
 ):
     create_folder_without_clear(Path(output_dir))
@@ -385,7 +385,7 @@ def feature_table(
 @click.option("-func", "--func-map", help=DESC_FUNC_MAP)
 @click.option("-d", "--divide", is_flag=True, default=False, help=DESC_DIVIDE)
 # fmt: on
-def features(
+def features_custom(
     input_dir,
     output_dir,
     suffix,
