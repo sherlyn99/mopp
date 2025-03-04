@@ -2,44 +2,44 @@
 
 <h3> <p align = "center"> How can MOPP help me? </p> </h3>
 
-This tool helps with processing multiomics sequencing data including metagenomics, 
-metatranscriptomics, and metatranslatomics data. There are three typical use 
+This tool helps with processing multiomics sequencing data including metagenomics, metatranscriptomics, and metatranslatomics data. There are two typical use 
 cases of this pipeline:
 
 (1) To analyze all omics at the same time, run `mopp workflow --help`
 
-(2) To analyze each omic, run `mopp metag --help` .etc
+(2) To run a single analysis step, run `mopp trim --help`.etc
 
-(3) To run a single analysis step, run `mopp trim --help`.etc
-
-The culmination of the pipelines is the creation of a feature count table using Woltka. 
+The culmination of the pipelines is the creation of a feature count table which enumerates the taxon and function of the samples examined. 
 
 <h3> <p align = "center"> What do I need to run MOPP? </p> </h3>
 
 Different use cases may have more requirements, but for every use case, the following are necessary:
 1. An input folder with your sequencing data
-2. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/test/data/metadata.tsv). Please avoid . in naming files unless . is used before suffix. Please avoid _Rxx in namig files unless it is for indicating strand (e.g. _R1, _R2). If any data is not meant to be paired, just put 'R1' in the strand column.
+2. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/test/data/metadata.tsv). Please avoid '.' in naming files unless . is used before suffix. Please avoid '_Rxx' in naming files unless it is for indicating strand (e.g. _R1, _R2). If any data is not meant to be paired, just put 'r1' in the strand column.
+3. A microbial genome database. We recommend [Web of Life 2 (WoLr2)](http://ftp.microbio.me/pub/wol2/).
 
 
 ***
 <h2> <p align ="center"> Installation </p> </h2>
 
-To install the most up-to-date version of mopp, run the following command
+To install the most up-to-date version of mopp, run the following command. Depending on which system you are on, you can use either `mopp_mac.yml` or `mopp_linux.yml`. 
 ```
 git clone https://github.com/sherlyn99/mopp.git
 cd mopp
 conda env create -f mopp_<os>.yml -n mopp
 conda activate mopp
 pip install -e .
-
-# do not deactivate the conda environment at this moment
+```
+MOPP uses `micov` for calculating genome coverages and filtering genomes based on coverage thresholds. Micov runs on matplotlib >= 3.9 and polars-u64-idx >= 1.21. Learn more about it [here](https://github.com/biocore/micov).
+```
+# do not deactivate the conda environment
 # install the coverage-calculation tool, micov, separately
 cd ..
 git clone https://github.com/biocore/micov.git
 cd micov
 pip install -e .
 ```
-or use mamba for faster installation. 
+
 
 Run the following command to make sure the installation is complete.
 ```
@@ -48,61 +48,132 @@ micov --help
 mopp --help
 ```
 
-Note that if the creation of conda environment using yml files fails, an alternative is to do the following
+Note that if the creation of conda environment using yml files fails, an alternative is try the following
 ```
-conda create -n mopp_dev_sherlyn python=3.12 -c conda-forge -c bioconda \
-  matplotlib scipy polars click tqdm numba duckdb pyarrow bowtie2 trim-galore woltka
+conda create -n mopp_dev_sherlyn python=3.12 -c conda-forge -c bioconda matplotlib scipy polars click tqdm numba duckdb pyarrow bowtie2 trim-galore woltka
 ```
 
-Micov runs on matplotlib >= 3.9 and polars-u64-idx >= 1.21.
-
-Note that if you did `pip install -e .`, which is a local installation, you need to keep the source code (do not delete it) for the package to run.
+If you did `pip install -e .`, which is a local installation, you need to keep the source code for the package to run.
 
 ***
 <h2> <p align ="center"> Dependencies </p> </h2>
 
-The Web of Life (WoL) Database is used by MOPP as a reference for microbe phylogenies. This database is not included in the distribution and must be downloaded independently [here](https://biocore.github.io/wol/download). You can use the following command to download the required database files. 
+The Web of Life (WoL) Database is used by MOPP as a reference for microbe phylogenies. This database is not included in the distribution and must be downloaded independently [here](http://ftp.microbio.me/pub/wol2/). You can use the following command to download the required database files. 
 ```
 # make sure you are in mopp directory
-mkdir mopp_db
-cd mopp_db
-wget --no-check-certificate -nH -np -r --cut-dirs=1  https://ftp.microbio.me/pub/wol-20April2021/ --reject="index.html*"
+mkdir wol2
+cd wol2
+wget --no-check-certificate -nH -np -r --cut-dirs=1  http://ftp.microbio.me/pub/wol2/ --reject="index.html*"
 ```
-
-Create bowtie2 index of the WoL database by running the followig commands.
-```
-cd wol-20April2021
-mkdir -p databases/bowtie2
-xzcat genomes/concat.fna.xz > /tmp/input.fna
-bowtie2-build --seed 42 /tmp/input.fna databases/bowtie2/WoLr1
-rm /tmp/input.fna
-```
-
-MOPP uses `micov` for calculating genome coverages and filtering genomes based on coverage thresholds. This library is included in the conda environment. Learn more about it [here](https://github.com/biocore/micov).
-
 ***
 
 <h2> <p align ="center"> Documentation </p> </h2>
 
+<h4> <p align ="center"> test runs </p> </h4>
+
+Use case 1: `mopp workflow`
+
+If you want to use one command for all processing steps, run the following test command. See 'mopp workflow' section for more information.
+```bash
+mopp workflow -i ./tests/test_data \                                          # input directory containing fastq.gz
+              -m ./tests/test_data/metadata_template.tsv \                    # metadata
+              -o ./tests/test_out_wf \                                        # set output folder
+              -x ./tests/test_database/wol2_test/databases/bowtie2/WoLr2 \    # bowtie2 index of microbial genome database
+              -l ./tests/test_database/wol2_test/genomes/length.map \         # genome length
+              -c 20 \                                                         # coverage threshold (min: 0.0, max: 100.0)
+              -ref ./tests/test_database/wol2_test/genomes/all.fna \          # reference genomes
+              -p wol2_subset \                                                # prefix of subset index
+              -db ./tests/test_database/wol2_test \                           # microbial genome database with functional annotations
+              -r genus,species \                                              # set rank for feature tables
+              -strat \                                                        # generate stratified tables
+              -t 4                                                            # number of threads
+```
+
+Use case 2: `mopp <module>`
+
+If you prefer to run each step separately, run the following test command.
+```bash
+# step 1a: auto-generate metadata
+mopp metadata \
+   -i ./tests/test_data \
+   -o ./tests/test_out/metadata/metadata.tsv \
+   -p \
+   -m
+
+# step 1b: validate metadata
+mopp metadata \
+   -i ./tests/test_out/metadata/metadata.tsv \
+   -p \
+   -m
+
+# step 2: trim data
+mopp trim \
+   -i ./tests/test_data \
+   -o ./tests/test_out/trimmed \
+   -m ./tests/test_out/metadata/metadata.tsv \
+   -t 4
+
+# step 3: align metagenomics data to the reference database for coverage calculation
+mopp align \
+   -i ./tests/test_out/trimmed \
+   -p '*metaG*.fq.gz' \
+   -x ./tests/test_database/wol2_test/databases/bowtie2/WoLr2 \
+   -o ./tests/test_out/aligned_metaG \
+   -t 4 \
+   --compress-samfiles
+
+# step 4: calculate coverages
+mopp cov \
+   -i ./tests/test_out/aligned_metaG/samfiles \
+   -o ./tests/test_out/cov \
+   -l ./tests/test_database/wol2_test/genomes/length.map
+
+# step 5: generate subset reference database which contains only genomes above a certain coverage cutoff (20 here).
+mopp index \
+   -i ./tests/test_out/cov/coverage_calculation.tsv \
+   -c 20 \
+   -ref ./tests/test_database/wol2_test/genomes/all.fna \
+   -o  ./tests/test_out/index \
+   -p wol2_subset
+
+# step 6: align all trimmed data to the subset reference database index
+mopp align \
+   -i ./tests/test_out/trimmed \
+   -p '*.fq.gz' \
+   -x ./tests/test_out/index/wol2_subset_bt2index/wol2_subset \
+   -o ./tests/test_out/aligned \
+   -t 4 \
+   --compress-samfiles
+
+# step 7: generate feature tables
+mopp features \
+   -i ./tests/test_out/aligned/samfiles \
+   -o ./tests/test_out/features \
+   -db ./tests/test_database/wol2_test \
+   -r genus,species \
+   -strat
+```
+
+<h2> <p align ="center"> </p> </h2>
+
 <h4> <p align ="center"> mopp workflow </p> </h4>
 
-usage: `mopp workflow -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -x <Index> -t <Num Threads> -l <Genome Lengths Path> -c <Cutoff> -ref <Reference Database> -p <Index Prefix>`
+usage: `mopp workflow -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -x <Index> -t <Num Threads> -l <Genome Lengths Path> -c <Cutoff> -ref <Reference Database> -p <Subset Index Prefix>`
 
 example: 
 ```
-mopp workflow -i ./test/data \
-              -o ./test/data/out3/ \
-              -m ./test/data/metadata.tsv \
-              -x ./test/data/wol_subset_index/wol_subset0.1_index \
-              -t 4 \
-              -l /home/y1weng/genome_lengths.tsv \
-              -c 0.1 \
-              -ref ./test/data/wol_subset_index/wol_above10.concat.fna \
-              -p myTest \
-              -r genus,species \
-              -db /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 \
-              -strat \
-              -r genus,species
+mopp workflow -i ./tests/test_data \                                          
+              -m ./tests/test_data/metadata_template.tsv \                   
+              -o ./tests/test_out_wf \                                        
+              -x ./tests/test_database/wol2_test/databases/bowtie2/WoLr2 \    
+              -l ./tests/test_database/wol2_test/genomes/length.map \        
+              -c 20 \                                                         
+              -ref ./tests/test_database/wol2_test/genomes/all.fna \          
+              -p wol2_subset \                                                
+              -db ./tests/test_database/wol2_test \                           
+              -r genus,species \                                              
+              -strat \                                                        
+              -t 4                                                            
 ```
 
 This is the central tool to MOPP, where you can analyze all omics at the same time.
@@ -126,6 +197,8 @@ The workflow takes the following steps:
 
 <h4> <p align ="center"> mopp metadata </p> </h4>
 
+usage: `mopp metadata -i <Input Directory/Input Path> -o <Output Path>`
+
 This module is for creating and/or validating metadata. An accurate and 
 correctly formatted metadata is essential for downstream processing and 
 analysis. Here is a template of metadata used by MOPP. Note that values like 
@@ -145,8 +218,6 @@ metaG, metaT, and metaRS.
 
 A log file will be created in the output directory, which can be used for 
 troubleshooting. 
-
-usage: `mopp metadata -i <Input Directory/Input Path> -o <Output Path>`
 
 example 1 (Auto-generate & validat a metadata file): 
 ```
@@ -199,13 +270,13 @@ example:
 mopp align \
    -i ./tests/test_out/trimmed \
    -p '*metaG*.fq.gz' \
-   -x ./tests/test_database/reference/databases/bowtie2/db \
+   -x ./tests/test_database/wol2_test/databases/bowtie2/WoLr2 \
    -o ./tests/test_out/aligned_metaG \
    -t 4 \
    --compress-samfiles
 ```
 
-`mopp align` aligns the sequencing data provided in the input directory to the reference index. Providing a file pattern `-p` allows for specification of files with certain name patterns. Allocating more threads to this command `-t` can reduce processing time.
+`mopp align` aligns the sequencing data provided in the input directory to the reference index. Providing a file pattern `-p` allows for specification of files with certain name patterns (e.g. '*.fq.gz' aligns all files with filenames ending with `.fq.gz`). Allocating more threads to this command `-t` can reduce processing time.
 
 The `-x` argument accepts the path and prefix of the index files created by the bowtie2-build command. bowtie2-build outputs the forward (.bt2) and reverse (rev.bt2) index files. Our parameter requests the common prefix that is shared by all these files, before the forward/reverse designation.
 
@@ -217,15 +288,15 @@ The `-x` argument accepts the path and prefix of the index files created by the 
 
 usage: `mopp cov -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -l <Genome Lengths Path>`
 
+`mopp cov` uses micov's `compress` to produce a spreadsheet with calculated genome coverages. This is essential for selecting an optimal coverage threshold when generating a subset index.
+
 example: 
 ```
 mopp cov \
    -i ./tests/test_out/aligned_metaG/samfiles \
    -o ./tests/test_out/cov \
-   -l ./tests/test_database/reference/genomes/length.map
+   -l ./tests/test_database/wol2_test/genomes/length.map
 ```
-
-`mopp cov` uses micov's `compress` to produce a spreadsheet with calculated genome coverages. This is essential for selecting an optimal coverage threshold when generating a subset index.
 
 <h2> <p align ="center"> </p> </h2>
 
@@ -233,14 +304,29 @@ mopp cov \
 
 usage: `mopp index -i <Input Coverage> -o <Output Directory> -c <Cutoff> -ref <Reference Database> -p <Prefix>`
 
+`-c` is the coverage cutoff used for creating a subset index containing all 
+genomes that have a coverage equal to or greater than the cutoff. Cutoff ranges
+from 0 to 100. 
+
 example: 
 ```
 mopp index \
    -i ./tests/test_out/cov/coverage_calculation.tsv \
    -c 20 \
-   -ref ./tests/test_database/reference/genomes/db.fna \
+   -ref ./tests/test_database/wol2_test/genomes/all.fna \
    -o  ./tests/test_out/index \
-   -p db_subset
+   -p wol2_subset
+```
+
+align to the new index:
+```
+mopp align \
+   -i ./tests/test_out/trimmed \
+   -p '*.fq.gz' \
+   -x ./tests/test_out/index/db_subset_bt2index/db_subset \
+   -o ./tests/test_out/aligned \
+   -t 4 \
+   --compress-samfiles
 ```
 
 `mopp index` creates a subset index from a larger database, given a cutoff threshold. For example, `-c 0.2` would generate a subset that only contains genomes with 20% or greater coverage.
@@ -249,19 +335,20 @@ mopp index \
 
 <h4> <p align ="center"> mopp feature_table </p> </h4>
 
-usage: `mopp feature-table -i <Input Directory> -o <Output Directory> -db <Woltka Database> -strat <Stratification>`
+usage: `mopp features-i <Input Directory> -o <Output Directory> -db <Woltka Database> -r <rank> -strat <Stratification> `
+
+`mopp features` is the culmination of the processing pipeline. Given the processed sequencing files, the command produces a feature count table using the Woltka database. Stratification options include `species`, `genus`, and `genus,species`
 
 example: 
 ```
-mopp feature-table -i ./test/data/out3/aligned/samfiles \
-   -o ./test/data/out2/features \
-   -db /panfs/y1weng/01_woltka_db/wol1/wol-20April2021 \
-   -strat \
-   -r genus,species
+mopp features \
+   -i ./tests/test_out/aligned/samfiles \
+   -o ./tests/test_out/features \
+   -db ./tests/test_database/wol2_test \
+   -r genus,species \
+   -strat
 ```
-
-`mopp feature_table` is the culmination of the processing pipeline. Given the processed sequencing files, the command produces a feature count table using the Woltka database. Stratification options include `species`, `genus`, and `genus,species`
 
 ***
 <h2> <p align ="center"> FAQs </p> </h2>
-coming soon
+See 'issues' for common errors encountered when running MOPP. 

@@ -1,0 +1,6 @@
+sample_name	identifier	omic	strand
+sample1_metaG_S121_L004_R1_001_250k.fastq.gz	sample1	metaG	r1
+sample1_metaG_S121_L004_R2_001_250k.fastq.gz	sample1	metaG	r2
+sample1_metaRS_S13_L004_R1_001_250k.fastq.gz	sample1	metaRS	r1
+sample1_metaT_sub10_S37_L004_R1_001_250k.fastq.gz	sample1	metaT	r1
+sample1_metaT_sub10_S37_L004_R2_001_250k.fastq.gz	sample1	metaT	r2
