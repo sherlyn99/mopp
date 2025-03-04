@@ -124,33 +124,85 @@ The workflow takes the following steps:
 
 <h2> <p align ="center"> </p> </h2>
 
+<h4> <p align ="center"> mopp metadata </p> </h4>
+
+This module is for creating and/or validating metadata. An accurate and 
+correctly formatted metadata is essential for downstream processing and 
+analysis. Here is a template of metadata used by MOPP. Note that values like 
+'r1' and 'r2' under the column `strand` should be in small caps. 
+
+If the input is a directory,  MOPP is going to search for all files end 
+in '.fastq.gz' or 'fq.gz' and then auto-generate a  metadata based on the 
+results of the search and the auto-generated metadata will be  validated. 
+
+If you already have a manually created metadata, MOPP will validate it when 
+the input is a path to the metadata file. By default, MOPP checks if the 
+metadata is in the correct format.
+
+If `--paired` is specified,  MOPP will check if all metaG/metaT data has both 
+R1 and R2. If `--multiomics` is specified,  MOPP will check if all samples have 
+metaG, metaT, and metaRS.
+
+A log file will be created in the output directory, which can be used for 
+troubleshooting. 
+
+usage: `mopp metadata -i <Input Directory/Input Path> -o <Output Path>`
+
+example 1 (Auto-generate & validat a metadata file): 
+```
+mopp metadata \
+   -i ./tests/test_data \
+   -o ./tests/test_out/metadata/metadata.tsv \
+   -p \
+   -m
+```
+
+example 2 (Validate a metadata file)
+
+In this case, you do not need to specify an output directory. The log file 
+will be generated in the directory containing the `metadata.tsv`. `-o` argument,
+if supplied, will be ignored. 
+```
+mopp metadata \
+   -i ./tests/test_out/metadata/metadata.tsv \
+   -p \
+   -m
+```
+
+<h2> <p align ="center"> </p> </h2>
+
 <h4> <p align ="center"> mopp trim </p> </h4>
+
+`mopp trim` trims sequencing data provided in the input directory. The metadata
+ indicates which type of data it is (metaG, metaT, or metaRS) so that optimal 
+ trimming parameters can be selected case-by-case.
 
 usage: `mopp trim -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)>`
 
 example: 
 ```
-mopp trim -i ./test/data \
-   -o ./test/data/out3/cat \
-   -m ./test/data/metadata.tsv
+mopp trim \
+   -i ./tests/test_data \
+   -o ./tests/test_out/trimmed \
+   -m ./tests/test_out/metadata/metadata.tsv \
+   -t 4
 ```
-
-`mopp trim` trims sequencing data provided in the input directory. The metadata indicates which type of data it is (metaG, metaT, or metaRS) so that optimal trimming parameters can be selected case-by-case. 
-
 
 <h2> <p align ="center"> </p> </h2>
 
 <h4> <p align ="center"> mopp align </p> </h4>
 
-usage: `mopp align -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> -p <Pattern> -x <Index> -t <Num Threads>`
+usage: `mopp align -i <Input Directory> -o <Output Directory> -p <Pattern> -x <Index> -t <Num Threads>`
 
 example:
 ```
-mopp align -i ./test/data/out3/cat \
-   -p *.fq.gz \
-   -o ./test/data/out3/aligned \
-   -x ./test/data/wol_subset_index/wol_subset0.1_index \
-   -t 4
+mopp align \
+   -i ./tests/test_out/trimmed \
+   -p '*metaG*.fq.gz' \
+   -x ./tests/test_database/wol_subset_index/wol_subset0.1_index \
+   -o ./tests/test_out/aligned \
+   -t 4 \
+   --compress-samfiles
 ```
 
 `mopp align` aligns the sequencing data provided in the input directory to the reference index. Providing a file pattern `-p` allows for specification of files with certain name patterns. Allocating more threads to this command `-t` can reduce processing time.
@@ -167,9 +219,10 @@ usage: `mopp cov -i <Input Directory> -o <Output Directory> -m <Metadata (tsv)> 
 
 example: 
 ```
-mopp cov -i ./test/data/out3/aligned/samfiles \
-   -o ./test/data/out3/cov \
-   -l genome_lengths.tsv
+mopp cov \
+   -i ./tests/test_out/aligned_metaG/samfiles \
+   -o ./tests/test_out/cov \
+   -l ./tests/test_database/genome_lengths.tsv
 ```
 
 `mopp cov` uses micov's `compress` to produce a spreadsheet with calculated genome coverages. This is essential for selecting an optimal coverage threshold when generating a subset index.
