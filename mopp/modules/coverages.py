@@ -76,6 +76,12 @@ def plot_effect_of_filteration(input, output_dir):
         )
 
 
+def sort_cov(inpath, outpath):
+    df_cov = pd.read_csv(inpath, sep='\t', low_memory=False)
+    df_cov = df_cov.sort_values(by = 'percent_covered', ascending=False)
+    df_cov.to_csv(outpath, sep='\t', index=False, header=True)
+
+
 def calculate_coverages(input_dir, output_dir, genome_lengths):
     create_folder_without_clear(output_dir)
 
@@ -87,7 +93,6 @@ def calculate_coverages(input_dir, output_dir, genome_lengths):
         cmd = f"xzcat {file_list} | micov compress --output {output_file} --lengths {genome_lengths}"
 
     else:
-
         files = glob(os.path.join(input_dir, "*.sam"))
         if files:
             file_list = " ".join(files)
@@ -106,7 +111,10 @@ def calculate_coverages(input_dir, output_dir, genome_lengths):
         logger.error(err)
     else:
         logger.info(f"Calculate coverages finished")
+        sort_cov(output_file, output_file)
+        logger.info(f"Sorting covearges finished")
         plot_genome_density(output_file, output_dir)  
         plot_effect_of_filteration(output_file, output_dir)
+        logger.info("Plots generated")
 
 
