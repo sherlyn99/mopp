@@ -34,10 +34,7 @@ MOPP uses `micov` for calculating genome coverages and filtering genomes based o
 ```
 # do not deactivate the conda environment
 # install the coverage-calculation tool, micov, separately
-cd ..
-git clone https://github.com/biocore/micov.git
-cd micov
-pip install -e .
+pip install micov
 ```
 
 
@@ -162,18 +159,19 @@ usage: `mopp workflow -i <Input Directory> -o <Output Directory> -m <Metadata (t
 
 example: 
 ```
-mopp workflow -i ./tests/test_data \                                          
-              -m ./tests/test_data/metadata_template.tsv \                   
-              -o ./tests/test_out_wf \                                        
-              -x ./tests/test_database/wol2_test/databases/bowtie2/WoLr2 \    
-              -l ./tests/test_database/wol2_test/genomes/length.map \        
-              -c 20 \                                                         
-              -ref ./tests/test_database/wol2_test/genomes/all.fna \          
-              -p wol2_subset \                                                
-              -db ./tests/test_database/wol2_test \                           
-              -r genus,species \                                              
-              -strat \                                                        
-              -t 4                                                            
+mopp workflow \
+   -i ./tests/test_data \
+   -m ./tests/test_data/metadata_template.tsv \
+   -o ./tests/test_out_wf \
+   -x ./tests/test_database/wol2_test/databases/bowtie2/WoLr2 \
+   -l ./tests/test_database/wol2_test/genomes/length.map \
+   -c 20 \
+   -ref ./tests/test_database/wol2_test/genomes/all.fna \
+   -p wol2_subset \
+   -db ./tests/test_database/wol2_test \
+   -r genus,species \
+   -strat \
+   -t 4
 ```
 
 This is the central tool to MOPP, where you can analyze all omics at the same time.
@@ -351,4 +349,20 @@ mopp features \
 
 ***
 <h2> <p align ="center"> FAQs </p> </h2>
-See 'issues' for common errors encountered when running MOPP. 
+
+1. `micov --help` hits `ImportError: cannot import name '_maybe_init_credentil_provider' from 'polars.io.cloud.credential_provider'`.
+
+   Try the following and rerun `micov --help`
+   ```bash
+   pip uninstall polars
+   pip install polars
+   ```
+
+2. When I try to run mopp, I got the error`xzcat command not found`
+
+   Mopp assumes you have [xz](https://tukaani.org/xz/). Try installing `xz` by running
+   ```bash
+   conda install anaconda::xz
+   ```
+<br>
+   See 'issues' for more common errors encountered when running MOPP. 
