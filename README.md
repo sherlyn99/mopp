@@ -57,7 +57,6 @@ If you did `pip install -e .`, which is a local installation, you need to keep t
 
 The Web of Life (WoL) Database is used by MOPP as a reference for microbe phylogenies. This database is not included in the distribution and must be downloaded independently [here](http://ftp.microbio.me/pub/wol2/). You can use the following command to download the required database files. 
 ```
-# make sure you are in mopp directory
 mkdir wol2
 cd wol2
 wget --no-check-certificate -nH -np -r --cut-dirs=1  http://ftp.microbio.me/pub/wol2/ --reject="index.html*"
