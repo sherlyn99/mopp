@@ -15,7 +15,7 @@ The culmination of the pipelines is the creation of a feature count table which 
 
 Different use cases may have more requirements, but for every use case, the following are necessary:
 1. An input folder with your sequencing data
-2. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/test/data/metadata.tsv). Please avoid '.' in naming files unless . is used before suffix. Please avoid '_Rxx' in naming files unless it is for indicating strand (e.g. _R1, _R2). If any data is not meant to be paired, just put 'r1' in the strand column.
+2. A tab-delimited metadata file describing the sequencing data you would like processed and follows this [template](https://github.com/sherlyn99/mopp/blob/main/tests/test_data/metadata_template.tsv). Please avoid '.' in naming files unless . is used before suffix. Please avoid '_Rxx' in naming files unless it is for indicating strand (e.g. _R1, _R2). If any data is not meant to be paired, just put 'r1' in the strand column.
 3. A microbial genome database. We recommend [Web of Life 2 (WoLr2)](http://ftp.microbio.me/pub/wol2/).
 
 
