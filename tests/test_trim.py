@@ -1,7 +1,5 @@
 import unittest
-import shutil
 import logging
-import subprocess
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 from mopp.modules.trim import (

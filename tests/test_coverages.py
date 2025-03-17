@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 import os
 import subprocess
-from unittest.mock import patch, MagicMock
-import matplotlib.pyplot as plt
-from mopp.modules.coverages import plot_genome_density, plot_effect_of_filteration, calculate_coverages  
+import tempfile
+from unittest.mock import patch, MagicMock, mock_open
+from mopp.modules.coverages import plot_genome_density, plot_effect_of_filteration, calculate_coverages, sort_cov
 
 class TestPlotGenomeDensity(unittest.TestCase):
 
@@ -28,27 +28,22 @@ class TestPlotGenomeDensity(unittest.TestCase):
         })
         mock_read_csv.return_value = mock_df
 
-        # Mock the behavior of gaussian_kde
         mock_kde_instance = MagicMock()
         mock_kde.return_value = mock_kde_instance
         mock_kde_instance.evaluate.return_value = np.random.rand(10000)  
 
         plot_genome_density('test_input.tsv', 'output_directory')
 
-        # Assertions to check if methods were called
         mock_read_csv.assert_called_once_with('test_input.tsv', sep="\t")
         mock_fill_between.assert_called()
         mock_savefig.assert_called_once_with('output_directory/density.png', dpi=300, bbox_inches='tight')
 
-        # Check the limits of the y-axis were set correctly
         mock_ylim.assert_called()
 
-        # Check the title and labels were set
         mock_title.assert_called_once_with('Density Plot of Genome Coverage')
         mock_xlabel.assert_called_once_with('Genome Coverage (3-100%)')
         mock_ylabel.assert_called_once_with('Density')
 
-        # Check that the KDE instance was created and evaluated
         mock_kde.assert_called_once()
         mock_kde_instance.evaluate.assert_called()
 
@@ -74,12 +69,12 @@ class TestPlotEffectOfFiltration(unittest.TestCase):
      
         plot_effect_of_filteration('test_input.tsv', 'output_directory')
 
-        # Assertions to check if methods were called
+       
         mock_read_csv.assert_called_once_with('test_input.tsv', sep="\t")
         mock_plot.assert_called()
         mock_savefig.assert_called_once_with('output_directory/feature_vs_coverage.png', dpi=300, bbox_inches='tight')
 
-        # Check that the appropriate labels and title were set
+       
         mock_xlabel.assert_called_once_with('Minimum Coverage Percentage')
         mock_ylabel.assert_called_once_with('Number of OGUs remaining')
         mock_title.assert_called_once_with('Effect of Coverage Filtration on OGU count')
@@ -91,8 +86,10 @@ class TestCalculateCoverages(unittest.TestCase):
     @patch('mopp.modules.coverages.glob')
     @patch('mopp.modules.coverages.create_folder_without_clear') 
     @patch('mopp.modules.coverages.plot_genome_density')  
-    @patch('mopp.modules.coverages.plot_effect_of_filteration') 
-    def test_calculate_coverages_with_sam_xz_files(self, mock_plot_effect, mock_plot_genome_density, 
+    @patch('mopp.modules.coverages.plot_effect_of_filteration')
+    @patch('mopp.modules.coverages.sort_cov')
+    @patch('builtins.open', new_callable=mock_open) 
+    def test_calculate_coverages_with_sam_xz_files(self, mock_file_open, mock_sort_cov, mock_plot_effect, mock_plot_genome_density, 
                                                     mock_create_folder, mock_glob, mock_popen):
         input_dir = 'test_input_dir'
         output_dir = 'test_output_dir'
@@ -109,17 +106,16 @@ class TestCalculateCoverages(unittest.TestCase):
        
         calculate_coverages(input_dir, output_dir, genome_lengths)
 
-        # Assert create_folder_without_clear was called
         mock_create_folder.assert_called_once_with(output_dir)
-
-        # Assert glob was called to find .sam.xz files
         mock_glob.assert_called_once_with(os.path.join(input_dir, "*.sam.xz"))
 
-        # Assert subprocess.Popen was called with the correct command
+
         expected_command = "xzcat file1.sam.xz file2.sam.xz | micov compress --output test_output_dir/coverage_calculation.tsv --lengths genome_lengths.txt"
         mock_popen.assert_called_once_with(expected_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
-        # Assert plotting functions were called
+        output_file = os.path.join(output_dir, "coverage_calculation.tsv")
+        
+       
         mock_plot_genome_density.assert_called_once()
         mock_plot_effect.assert_called_once()
 
@@ -127,8 +123,10 @@ class TestCalculateCoverages(unittest.TestCase):
     @patch('mopp.modules.coverages.glob')
     @patch('mopp.modules.coverages.create_folder_without_clear') 
     @patch('mopp.modules.coverages.plot_genome_density')  
-    @patch('mopp.modules.coverages.plot_effect_of_filteration') 
-    def test_calculate_coverages_with_sam_files(self, mock_plot_effect, mock_plot_genome_density,
+    @patch('mopp.modules.coverages.plot_effect_of_filteration')
+    @patch('mopp.modules.coverages.sort_cov')
+    @patch('builtins.open', new_callable=mock_open)  
+    def test_calculate_coverages_with_sam_files(self, mock_file_open, mock_sort_cov, mock_plot_effect, mock_plot_genome_density,
                                                  mock_create_folder, mock_glob, mock_popen):
         input_dir = 'test_input_dir'
         output_dir = 'test_output_dir'
@@ -151,18 +149,17 @@ class TestCalculateCoverages(unittest.TestCase):
        
         calculate_coverages(input_dir, output_dir, genome_lengths)
 
-        # Assert create_folder_without_clear was called
+        
         mock_create_folder.assert_called_once_with(output_dir)
 
-        # Assert glob was called to find .sam files
+
         mock_glob.assert_any_call(mock_join(input_dir, "*.sam.xz"))
         mock_glob.assert_any_call(mock_join(input_dir, "*.sam"))
 
-        # Assert subprocess.Popen was called with the correct command
+        
         expected_command = "cat file1.sam file2.sam | micov compress --output test_output_dir/coverage_calculation.tsv --lengths genome_lengths.txt"
         mock_popen.assert_called_once_with(expected_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
-        # Assert plotting functions were called
         mock_plot_genome_density.assert_called_once()
         mock_plot_effect.assert_called_once()
    
@@ -178,7 +175,38 @@ class TestCalculateCoverages(unittest.TestCase):
         with self.assertRaises(SystemExit):
             calculate_coverages(input_dir, output_dir, genome_lengths)
 
+    def test_sort_cov(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
 
+        
+        self.inpath = os.path.join(self.temp_dir.name, "input.tsv")
+        self.outpath = os.path.join(self.temp_dir.name, "output.tsv")
+        
+        obs = {
+            "genome_id": ["S1", "S2", "S3"],
+            "covered": [15, 79, 32],
+            "length": [10135, 6345, 15353],
+            "percent_covered": [0.3, 0.2, 0.5],
+        }
+        df = pd.DataFrame(obs)
+        df.to_csv(self.inpath, sep="\t", index=False)
+
+        exp = {
+            "genome_id": ["S3", "S1", "S2"],
+            "covered": [32, 15, 79],
+            "length": [15353, 10135, 6345],
+            "percent_covered": [0.5, 0.3, 0.2],
+        }
+        df_exp = pd.DataFrame(exp)
+
+
+        sort_cov(self.inpath, self.outpath)
+        df_obs = pd.read_csv(self.outpath, sep="\t")
+        
+
+        pd.testing.assert_frame_equal(df_obs, df_exp)
+        self.temp_dir.cleanup()
+        
 
 if __name__ == '__main__':
     unittest.main()
