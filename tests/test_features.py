@@ -91,6 +91,15 @@ class FeaturesTests(unittest.TestCase):
         exp_string = "woltka collapse -i ./tests/test_run/mopp_out/features/ogu_orf.tsv -o ./tests/test_run/mopp_out/features/ogu_func.tsv -m /projects/wol/qiyun/wol2/function/uniref/orf-to-uniref.map.xz -s | -f 2"
         self.assertEqual(obs_string, exp_string)
 
+    def test_run_command_success(self):
+       
+        with self.assertLogs(logger="mopp", level="INFO") as logs:
+            run_command(["echo", "Hello, World!"], "Test command")
+
+        
+        self.assertIn("Test command started", logs.output[0])
+        self.assertIn("Test command finished", logs.output[1])
+
 
 if __name__ == "__main__":
     unittest.main()
