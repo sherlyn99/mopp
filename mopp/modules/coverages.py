@@ -57,7 +57,7 @@ def plot_genome_density_x_axis_log_transform(input, output_dir):
     x = np.linspace(0.9, 101.1, 10000)
     kde_values = kde.evaluate(x)
 
-    threshold = 3
+    threshold = 0
     mask = x > threshold
     x_filtered = x[mask]
     kde_values_filtered = kde_values[mask]
@@ -70,7 +70,7 @@ def plot_genome_density_x_axis_log_transform(input, output_dir):
     plt.ylim(kde_values_filtered.min(), min(kde_values.max()*1.1, 1.2))
     plt.xlabel(f"Genome Coverage ({threshold}-100%)")
     plt.ylabel("Density")
-    plt.xticks([3, 10, 30, 100], labels=["3", "10", "30", "100"]) 
+    plt.xticks(range(0, 110, 10), labels=["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"]) 
     plt.xlim(threshold, 100)
     plt.title(f"Density Plot of Genome Coverage")
 
@@ -145,7 +145,7 @@ def calculate_coverages(input_dir, output_dir, genome_lengths, x_axis_transform)
 
         if x_axis_transform:
             plot_genome_density_x_axis_log_transform(output_file, output_dir)
-              
+
         plot_effect_of_filteration(output_file, output_dir)
         logger.info("Plots generated")
 
