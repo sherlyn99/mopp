@@ -32,6 +32,7 @@ from mopp._defaults import (
     DESC_TAX_MAP,
     DESC_FUNC_MAP,
     DESC_DIVIDE,
+    DESC_LOG_TRANSFORM
 )
 from mopp.modules.metadata import (
     autogenerate_metadata,
@@ -70,6 +71,7 @@ def mopp():
 @click.option("-c", "--cutoff", type=float, required=True, help=DESC_CUTOFF)
 @click.option("-ref", "--refdb", required=True, help=DESC_REFDB)  # index wol.fna
 @click.option("-p", "--prefix", required=True, help=DESC_PREFIX)  # index prefix
+@click.option("-b", "--log-transform", is_flag=True, default=False, help=DESC_LOG_TRANSFORM)
 @click.option(
     "-r",
     "--rank",
@@ -94,6 +96,7 @@ def workflow(
     cutoff,
     refdb,
     prefix,
+    log_transform,
     rank,
     woltka_database,
     stratification,
@@ -133,7 +136,7 @@ def workflow(
             threads,
         )
         calculate_coverages(
-            str(outdir_aligned_metaG_samfiles), str(outdir_cov), genome_lengths
+            str(outdir_aligned_metaG_samfiles), str(outdir_cov), genome_lengths, log_transform
         )
         genome_extraction(
             outdir_cov_file, cutoff, refdb, outdir_index, prefix, threads
@@ -283,8 +286,9 @@ def align(input_dir, output_dir, pattern, index, threads, compress_samfiles):
 @click.option("-i", "--input-dir", type=click.Path(exists=True), required=True, help=DESC_INPUT_SAM,)
 @click.option("-o", "--output-dir", type=click.Path(exists=False), required=True, help=DESC_OUTPUT)
 @click.option("-l", "--genome-lengths", type=click.Path(exists=True), required=True, help=DESC_GENOME_LENGTHS)
+@click.option("-b", "--log-transform", is_flag=True, default=False, help=DESC_LOG_TRANSFORM)
 # fmt: on
-def cov(input_dir, output_dir, genome_lengths):
+def cov(input_dir, output_dir, genome_lengths, log_transform):
     create_folder_without_clear(output_dir)
 
     logger.setLevel(logging.INFO)
@@ -299,7 +303,7 @@ def cov(input_dir, output_dir, genome_lengths):
 
     logger.info("Calculation of genome coverages started.")
     try:
-        calculate_coverages(input_dir, output_dir, genome_lengths)
+        calculate_coverages(input_dir, output_dir, genome_lengths, log_transform)
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
     else:
