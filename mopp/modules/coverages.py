@@ -48,6 +48,34 @@ def plot_genome_density(input, output_dir):
 
     plt.savefig(output_dir + "/density.png", dpi=300, bbox_inches="tight")
 
+def plot_genome_density_x_axis_log_transform(input, output_dir):
+    cov = pd.read_csv(input, sep="\t")
+    cov_sorted = cov.sort_values(by="percent_covered", ascending=False)
+    filtered_cov = cov_sorted[cov_sorted["percent_covered"] > 0]["percent_covered"]
+
+    kde = gaussian_kde(filtered_cov, bw_method=0.05)
+    x = np.linspace(0.9, 101.1, 10000)
+    kde_values = kde.evaluate(x)
+
+    threshold = 0
+    mask = x > threshold
+    x_filtered = x[mask]
+    kde_values_filtered = kde_values[mask]
+
+    plt.figure(figsize=(10, 6))
+    plt.fill_between(x_filtered, kde_values_filtered, color="#4c9390", alpha=0.8)
+
+    plt.xscale('log')
+
+    plt.ylim(kde_values_filtered.min(), min(kde_values.max()*1.1, 1.2))
+    plt.xlabel(f"Genome Coverage ({threshold}-100%)")
+    plt.ylabel("Density")
+    plt.xticks(range(0, 110, 10), labels=["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"]) 
+    plt.xlim(threshold, 100)
+    plt.title(f"Density Plot of Genome Coverage")
+
+    plt.savefig(output_dir + "/density_xaxislogtransform.png", dpi=300, bbox_inches="tight")
+
 
 def plot_effect_of_filteration(input, output_dir):
     df = pd.read_csv(input, sep="\t")
@@ -82,7 +110,7 @@ def sort_cov(inpath, outpath):
     df_cov.to_csv(outpath, sep='\t', index=False, header=True)
 
 
-def calculate_coverages(input_dir, output_dir, genome_lengths):
+def calculate_coverages(input_dir, output_dir, genome_lengths, x_axis_transform):
     create_folder_without_clear(output_dir)
 
     output_file = output_dir + "/coverage_calculation.tsv"
@@ -113,7 +141,11 @@ def calculate_coverages(input_dir, output_dir, genome_lengths):
         logger.info(f"Calculate coverages finished")
         sort_cov(output_file, output_file)
         logger.info(f"Sorting covearges finished")
-        plot_genome_density(output_file, output_dir)  
+        plot_genome_density(output_file, output_dir)
+
+        if x_axis_transform:
+            plot_genome_density_x_axis_log_transform(output_file, output_dir)
+
         plot_effect_of_filteration(output_file, output_dir)
         logger.info("Plots generated")
 

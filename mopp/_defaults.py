@@ -58,6 +58,7 @@ DESC_VALIDATE_PAIRED_END = "Enable metadata validation for paired-end data."
 DESC_VALIDATE_MULTIOMICS = "Enable metadata validation for multiomics data"
 DESC_INDEX = "Genome index."
 DESC_NTHREADS = "Number of threads. [default: 4]."
+DESC_LOG_TRANSFORM = "Provides density plot with log transformed x-axis."
 # module: align
 DESC_PATTERN = "File patterns to include for alignment."
 DESC_COMPRESS_SAM = "If yes, samfiles generated will be compressed."
@@ -83,6 +84,7 @@ DESC_COORDS_MAP = "Path to the coords.txt.xz file."
 DESC_TAX_MAP = "Path to the mapping file from genome id to taxa name."
 DESC_FUNC_MAP = "Path to the mapping file from gene coords to others (e.g. uniref, ko .etc)."
 DESC_DIVIDE = "If true, count each target feature as 1/k (k is the number of targets mapped to a source). Otherwise, count as one."
+
 
 
 # try:
