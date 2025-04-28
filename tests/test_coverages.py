@@ -104,7 +104,7 @@ class TestCalculateCoverages(unittest.TestCase):
         mock_popen.return_value = mock_process
         
        
-        calculate_coverages(input_dir, output_dir, genome_lengths)
+        calculate_coverages(input_dir, output_dir, genome_lengths, False)
 
         mock_create_folder.assert_called_once_with(output_dir)
         mock_glob.assert_called_once_with(os.path.join(input_dir, "*.sam.xz"))
@@ -147,7 +147,7 @@ class TestCalculateCoverages(unittest.TestCase):
         mock_popen.return_value = mock_process
 
        
-        calculate_coverages(input_dir, output_dir, genome_lengths)
+        calculate_coverages(input_dir, output_dir, genome_lengths, False)
 
         
         mock_create_folder.assert_called_once_with(output_dir)
@@ -173,7 +173,7 @@ class TestCalculateCoverages(unittest.TestCase):
         genome_lengths = 'genome_lengths.txt'
 
         with self.assertRaises(SystemExit):
-            calculate_coverages(input_dir, output_dir, genome_lengths)
+            calculate_coverages(input_dir, output_dir, genome_lengths, False)
 
     def test_sort_cov(self):
         self.temp_dir = tempfile.TemporaryDirectory()
