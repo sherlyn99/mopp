@@ -32,6 +32,9 @@ from mopp._defaults import (
     DESC_TAX_MAP,
     DESC_FUNC_MAP,
     DESC_DIVIDE,
+    DESC_FEATURETABLE,
+    DESC_KEGG,
+    DESC_UNIREF
 )
 from mopp.modules.metadata import (
     autogenerate_metadata,
@@ -45,6 +48,7 @@ from mopp.modules.index import genome_extraction
 from mopp.modules.features_wol import ft_generation
 from mopp.modules.utils import create_folder_without_clear
 from mopp.modules.features import gen_feature_table
+from mopp.modules.analysis import analysis
 
 
 logger = logging.getLogger("mopp")
@@ -83,6 +87,8 @@ def mopp():
 @click.option(
     "-strat", "--stratification", is_flag=True, default=False, help=DESC_STRAT
 )
+@click.option("-u", "--unirefmap", required=True, help=DESC_UNIREF)
+@click.option("-k", "--keggmap", required=True, help=DESC_KEGG)
 # fmt: on
 def workflow(
     input_dir,
@@ -97,6 +103,8 @@ def workflow(
     rank,
     woltka_database,
     stratification,
+    unirefmap,
+    keggmap
 ):
     create_folder_without_clear(Path(output_dir))
 
@@ -153,6 +161,13 @@ def workflow(
             rank_list,
             stratification,
         )
+        if 'species' in rank_list:
+            outdir_analysis = Path(output_dir) / "analysis"
+            create_folder_without_clear(Path(output_dir)/ "analysis")
+
+            input_file = Path(outdir_features) / "species_level" / "counts_species_stratified.tsv"
+            input_file = input_file.resolve()
+            analysis(input_file, outdir_analysis, unirefmap, keggmap)
         logger.info("Workflow finished")
 
     except Exception as e:
@@ -417,6 +432,16 @@ def features_custom(
         func_map,
         divide,
     )
+
+@mopp.command()
+@click.option("-i", "--input", required=True, help=DESC_FEATURETABLE)
+@click.option("-o", "--output-dir", required=True, help=DESC_OUTPUT)
+@click.option("-u", "--unirefmap", required=True, help=DESC_UNIREF)
+@click.option("-k", "--keggmap", required=True, help=DESC_KEGG)
+def analyze(input, output_dir, unirefmap, keggmap):
+    create_folder_without_clear(Path(output_dir)/ "analysis")
+    analysis(input, Path(output_dir)/ "analysis", unirefmap, keggmap)
+
 
 
 if __name__ == "__main__":
