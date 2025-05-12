@@ -5,6 +5,8 @@ channels:
   - r
   - ursky
   - defaults
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
 dependencies:
   - python=3.12
   - conda-forge::matplotlib
@@ -18,3 +20,4 @@ dependencies:
   - bioconda::trim-galore
   - bioconda::bowtie2
   - bioconda::woltka
+  - r-base
