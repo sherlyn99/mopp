@@ -326,7 +326,7 @@ mopp align \
    --compress-samfiles
 ```
 
-`mopp index` creates a subset index from a larger database, given a cutoff threshold. For example, `-c 0.2` would generate a subset that only contains genomes with 20% or greater coverage.
+`mopp index` creates a subset index from a larger database, given a cutoff threshold. For example, `-c 20` would generate a subset that only contains genomes with 20% or greater coverage.
 
 <h2> <p align ="center"> </p> </h2>
 
